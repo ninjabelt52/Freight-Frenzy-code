@@ -52,13 +52,16 @@ public class ThresholdingTest extends LinearOpMode {
 
         int stage = 0;
         Mat ycrcb = new Mat();
+        Mat coi1 = new Mat();
+        Mat coi2 = new Mat();
+        Mat coi3 = new Mat();
         Mat threshold = new Mat();
 
         @Override
         public void onViewportTapped() {
             stage ++;
 
-            if(stage > 2){
+            if(stage > 6){
                 stage = 0;
             }
         }
@@ -66,15 +69,18 @@ public class ThresholdingTest extends LinearOpMode {
         @Override
         public Mat processFrame(Mat input){
             Imgproc.cvtColor(input, ycrcb, Imgproc.COLOR_RGB2YCrCb);
-            Core.extractChannel(ycrcb, ycrcb,0);
-            Imgproc.threshold(ycrcb, threshold, 255 * gamepad1.right_trigger, 100, Imgproc.THRESH_TOZERO);
+            Core.extractChannel(ycrcb, coi2, 1);
+
+            Imgproc.threshold(coi2, threshold, 255 * gamepad1.right_trigger, 100, Imgproc.THRESH_TOZERO);
 
             switch (stage){
                 case 0:
                     return ycrcb;
                 case 1:
-                    return threshold;
+                    return coi2;
                 case 2:
+                    return threshold;
+                case 3:
                     return input;
                 default:
                     return  input;
