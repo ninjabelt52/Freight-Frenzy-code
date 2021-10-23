@@ -36,7 +36,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 
-public class BaseWebcam extends LinearOpMode
+public class BaseWebcamExample extends LinearOpMode
 {
     OpenCvCamera webcam;
 
