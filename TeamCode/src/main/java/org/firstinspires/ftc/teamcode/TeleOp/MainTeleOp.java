@@ -49,14 +49,20 @@ public class MainTeleOp extends LinearOpMode {
             fr.setPower(straight + strafe - rotation);
 
             if(gamepad1.left_bumper){
-                duckWheel.setPower(.5);
+                duckWheel.setPower(.75);
             }else{
                 duckWheel.setPower(0);
             }
 
-            intake.setPower(gamepad1.right_trigger);
+            if(gamepad1.right_trigger > 0){
+                intake.setPower(gamepad1.right_trigger);
+            }else if(gamepad1.left_trigger > 0){
+                intake.setPower(-gamepad1.left_trigger);
+            }else{
+                intake.setPower(0);
+            }
 
-            targetPos += gamepad1.left_stick_y * .75;
+            targetPos += gamepad2.left_stick_y * .75;
 
             if(gamepad1.a){
                 targetPos = -280;
@@ -67,15 +73,16 @@ public class MainTeleOp extends LinearOpMode {
             arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             arm.setPower(1);
 
-            if(gamepad1.right_trigger > 0){
+            if(gamepad1.y){
+                gate.setPosition(.5);
+            }else{
                 gate.setPosition(0);
-            }else if(gamepad1.right_bumper){
-                gate.setPosition(1);
             }
 
             telemetry.addData("target pos", targetPos);
             telemetry.addData("left stick y", gamepad1.left_stick_y);
             telemetry.addData("motor power", intake.getPower());
+            telemetry.addData("duck wheel", duckWheel.getPower());
             telemetry.update();
         }
     }
