@@ -55,10 +55,10 @@ public class MainTeleOp extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
 
-            if(gamepad1.left_trigger > 0){
+            if(gamepad1.dpad_down){
                 slowDown = .5;
             }else{
-                slowDown = 1;
+                slowDown = .95;
             }
 
             straight = gamepad1.left_stick_y * slowDown;
@@ -70,7 +70,7 @@ public class MainTeleOp extends LinearOpMode {
             fl.setPower(straight - strafe + rotation);
             fr.setPower(straight + strafe - rotation);
 
-            if(gamepad2.left_bumper){
+            if(gamepad2.x){
                 //TODO: I think we should investigate this further in the future, but as for now,
                 // competition is next week.
 //                int startPos = duckWheel.getCurrentPosition();
@@ -79,6 +79,8 @@ public class MainTeleOp extends LinearOpMode {
 //                    duckWheel.setVelocity(360, AngleUnit.DEGREES);
 //                }
                 duckWheel.setVelocity(180, AngleUnit.DEGREES);
+            }else if(gamepad2.b){
+                duckWheel.setVelocity(-180, AngleUnit.DEGREES);
             }else{
                 duckWheel.setPower(0);
             }
@@ -95,25 +97,25 @@ public class MainTeleOp extends LinearOpMode {
                 bottomLimit = arm.getCurrentPosition();
             }
 
-            if(arm.getCurrentPosition() <= -400 && !(gamepad1.right_trigger > 0)){
+            if(arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0)){
                 arm.setTargetPosition(bottomLimit - 450);
                 armSupport.setTargetPosition(arm.getTargetPosition());
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 armSupport.setMode(arm.getMode());
                 arm.setPower(armPower);
                 armSupport.setPower(arm.getPower());
-            }else if(gamepad1.right_trigger > 0 && limit.getState()){
+            }else if(gamepad1.left_trigger > 0 && limit.getState()){
                 armPower = .25;
                 arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                arm.setPower(gamepad1.right_trigger * armPower);
+                arm.setPower(gamepad1.left_trigger * armPower);
                 armSupport.setPower(arm.getPower());
                 targetPos = arm.getCurrentPosition();
-            }else if(gamepad1.left_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400){
+            }else if(gamepad1.right_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400){
                 armPower = .5;
                 arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                arm.setPower(-gamepad1.left_trigger * armPower);
+                arm.setPower(-gamepad1.right_trigger * armPower);
                 armSupport.setPower(arm.getPower());
                 targetPos = arm.getCurrentPosition();
             }else{
@@ -125,9 +127,22 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setPower(arm.getPower());
             }
 
-            if(gamepad1.x){
+            if(gamepad1.a){
+                if(toggle){
+                   armState ++;
+                   toggle = false;
+                }
+            }else{
+                toggle = true;
+            }
+
+            if(armState > 1){
+                armState = 0;
+            }
+
+            if(gamepad1.a && armState == 1){
                 targetPos = bottomLimit - 350;
-            }else if(gamepad1.a){
+            }else if(gamepad1.a && armState == 0){
                 targetPos  = bottomLimit;
             }
 
