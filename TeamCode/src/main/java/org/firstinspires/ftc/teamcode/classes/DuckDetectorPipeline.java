@@ -28,7 +28,7 @@ public class DuckDetectorPipeline {
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,  "Webcam 1"), cameraMonitorViewId);
 
         thresh = new Threshold();
-            webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
             public void onOpened()
@@ -50,14 +50,12 @@ public class DuckDetectorPipeline {
 
         int stage = 0;
         Mat ycrcb = new Mat();
-        Mat coi1 = new Mat();
         Mat coi2 = new Mat();
-        Mat coi3 = new Mat();
         Mat threshold = new Mat();
 
-        Mat section1 = threshold.submat(new Rect(0,0,106,240));
-        Mat section2 = threshold.submat(new Rect(106,0,106,240));
-        Mat section3 = threshold.submat(new Rect(212,0,106,240));
+//        Mat section1 = threshold.submat(new Rect(0,0,106,240));
+//        Mat section2 = threshold.submat(new Rect(106,0,106,240));
+//        Mat section3 = threshold.submat(new Rect(212,0,106,240));
 
         double avg1, avg2, avg3;
 
@@ -72,16 +70,33 @@ public class DuckDetectorPipeline {
 
         @Override
         public Mat processFrame(Mat input){
+            telemetry = "pre-init";
+            Mat section1 = threshold.submat(0,240,0,106);
+            Mat section2 = threshold.submat(0,240,106,212);
+            Mat section3 = threshold.submat(0,240,212,318);
+
+            telemetry = "created submats";
+
             Imgproc.cvtColor(input, ycrcb, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(ycrcb, coi2, 1);
 
+            telemetry = "calculated channels";
+
             Imgproc.threshold(coi2, threshold, 200, 100, Imgproc.THRESH_TOZERO);
-            Imgproc.line(threshold, new Point(106,0), new Point(106,240), new Scalar(255,0,0), 2);
-            Imgproc.line(threshold, new Point(212,0), new Point(212,240), new Scalar(255,0,0), 2);
+
+            telemetry = "thresholded";
+
+            Imgproc.rectangle(threshold, new Point(0,0),new Point(106,240),new Scalar(255,0,0), 2);
+            Imgproc.rectangle(threshold, new Point(106,0),new Point(212,240),new Scalar(255,0,0), 2);
+            Imgproc.rectangle(threshold, new Point(212,0),new Point(318,240),new Scalar(255,0,0), 2);
+
+            telemetry = "drew rectangles";
 
             avg1 = Core.mean(section1).val[0];
             avg2 = Core.mean(section2).val[0];
             avg3 = Core.mean(section3).val[0];
+
+            telemetry = "calculated avgs";
 
             if(avg1 > avg2){
                 if(avg1 > avg3){

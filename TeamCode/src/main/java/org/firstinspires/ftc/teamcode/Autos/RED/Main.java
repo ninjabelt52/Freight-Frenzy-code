@@ -45,7 +45,7 @@ public class Main extends LinearOpMode {
         duckWheel.setVelocity(0, AngleUnit.DEGREES);
 
         Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(-64.38, -36, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-64.38, -12, Math.toRadians(180)))
                 .build();
 
         drive.followTrajectory(park);
@@ -67,7 +67,7 @@ public class Main extends LinearOpMode {
         drive.followTrajectory(backup);
 
         Trajectory end = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(-64.38, -36, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-64.38, -36, Math.toRadians(0)))
                 .addTemporalMarker(2, () -> {
                     arm.moveArm(0, .5);
                     arm.close();

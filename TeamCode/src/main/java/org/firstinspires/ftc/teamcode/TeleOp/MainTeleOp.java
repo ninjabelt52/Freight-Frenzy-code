@@ -42,6 +42,7 @@ public class MainTeleOp extends LinearOpMode {
 
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armSupport.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        duckWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armSupport.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
