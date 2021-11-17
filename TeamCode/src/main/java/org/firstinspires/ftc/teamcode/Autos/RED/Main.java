@@ -51,7 +51,7 @@ public class Main extends LinearOpMode {
         drive.followTrajectory(park);
 
         Trajectory deliver = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                .splineToLinearHeading(new Pose2d(-12,-2.38, Math.toRadians(90)), 0)
+                .splineToLinearHeading(new Pose2d(-12,-3.38, Math.toRadians(90)), 0)
                 .addTemporalMarker(1, () -> {
                     arm.moveArm(-350, .75);
                 })

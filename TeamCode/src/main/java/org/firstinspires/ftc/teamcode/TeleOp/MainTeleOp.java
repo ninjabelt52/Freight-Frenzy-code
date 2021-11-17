@@ -128,7 +128,7 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setPower(arm.getPower());
             }
 
-            if(gamepad1.a){
+            if(gamepad1.a || gamepad1.b){
                 if(toggle){
                    armState ++;
                    toggle = false;
@@ -143,12 +143,14 @@ public class MainTeleOp extends LinearOpMode {
 
             if(gamepad1.a && armState == 1){
                 targetPos = bottomLimit - 350;
-            }else if(gamepad1.a && armState == 0){
+            }else if((gamepad1.a || gamepad1.b) && armState == 0){
                 targetPos  = bottomLimit;
+            }else if(gamepad1.b && armState == 1){
+                targetPos = bottomLimit - 150;
             }
 
             if(gamepad1.y || gamepad1.right_bumper){
-                gate.setPosition(1);
+                gate.setPosition(.65);
             }else{
                 gate.setPosition(.45);
             }
