@@ -22,13 +22,13 @@ public class DuckDetectorPipeline {
     DuckPos position;
 
 
-    public DuckDetectorPipeline (HardwareMap hardwareMap){
+    public DuckDetectorPipeline (HardwareMap hardwareMap, String camName){
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,  "Webcam 1"), cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,  camName), cameraMonitorViewId);
 
         thresh = new Threshold();
-            webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
             public void onOpened()
@@ -50,14 +50,9 @@ public class DuckDetectorPipeline {
 
         int stage = 0;
         Mat ycrcb = new Mat();
-        Mat coi1 = new Mat();
         Mat coi2 = new Mat();
-        Mat coi3 = new Mat();
         Mat threshold = new Mat();
 
-        Mat section1 = threshold.submat(new Rect(0,0,106,240));
-        Mat section2 = threshold.submat(new Rect(106,0,106,240));
-        Mat section3 = threshold.submat(new Rect(212,0,106,240));
 
         double avg1, avg2, avg3;
 
@@ -72,16 +67,81 @@ public class DuckDetectorPipeline {
 
         @Override
         public Mat processFrame(Mat input){
+//            telemetry = "pre-init";
+//
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
+//            telemetry = "created submats";
+//
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
             Imgproc.cvtColor(input, ycrcb, Imgproc.COLOR_RGB2YCrCb);
             Core.extractChannel(ycrcb, coi2, 1);
 
-            Imgproc.threshold(coi2, threshold, 200, 100, Imgproc.THRESH_TOZERO);
-            Imgproc.line(threshold, new Point(106,0), new Point(106,240), new Scalar(255,0,0), 2);
-            Imgproc.line(threshold, new Point(212,0), new Point(212,240), new Scalar(255,0,0), 2);
+//            telemetry = "calculated channels";
+//
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
+            Imgproc.threshold(coi2, threshold, 180, 100, Imgproc.THRESH_TOZERO);
+
+//            telemetry = "thresholded";
+//
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
+
+            Imgproc.rectangle(threshold, new Point(0,0),new Point(106,240),new Scalar(255,0,0), 2);
+            Imgproc.rectangle(threshold, new Point(106,0),new Point(212,240),new Scalar(255,0,0), 2);
+            Imgproc.rectangle(threshold, new Point(212,0),new Point(318,240),new Scalar(255,0,0), 2);
+
+//            telemetry = "drew rectangles";
+//
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
+            Mat section1 = threshold.submat(new Rect(new Point(0,0), new Point(106,240)));
+            Mat section2 = threshold.submat(new Rect(new Point(106,0), new Point(212,240)));
+            Mat section3 = threshold.submat(new Rect(new Point(212,0), new Point(318,240)));
+
+//            telemetry = "created sections";
+//
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
 
             avg1 = Core.mean(section1).val[0];
             avg2 = Core.mean(section2).val[0];
             avg3 = Core.mean(section3).val[0];
+//
+//            telemetry = "calculated avgs";
+//
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
 
             if(avg1 > avg2){
                 if(avg1 > avg3){
@@ -103,19 +163,19 @@ public class DuckDetectorPipeline {
 
             switch (stage){
                 case 0:
-                    telemetry = "active stage is ycrcb";
+                    telemetry = "active stage is ycrcb" + "\navg 1: " + avg1 + "\navg 2: " + avg2 + "\navg 3: " + avg3;
                     return ycrcb;
                 case 1:
-                    telemetry = "active stage is coi";
+                    telemetry = "active stage is coi" + "\navg 1: " + avg1 + "\navg 2: " + avg2 + "\navg 3: " + avg3;
                     return coi2;
                 case 2:
-                    telemetry = "active stage is threshold";
+                    telemetry = "active stage is threshold" + "\navg 1: " + avg1 + "\navg 2: " + avg2 + "\navg 3: " + avg3;
                     return threshold;
                 case 3:
-                    telemetry = "active stage is input";
+                    telemetry = "active stage is input" + "\navg 1: " + avg1 + "\navg 2: " + avg2 + "\navg 3: " + avg3;
                     return input;
                 default:
-                    telemetry = "active stage is input";
+                    telemetry = "active stage is input" + "\navg 1: " + avg1 + "\navg 2: " + avg2 + "\navg 3: " + avg3;
                     return  input;
             }
         }
