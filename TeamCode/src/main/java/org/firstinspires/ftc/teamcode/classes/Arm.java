@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Arm {
     private DcMotor armL, armR;
     private Servo gate;
+
     public Arm (HardwareMap hardwareMap){
         armL = hardwareMap.get(DcMotor.class, "arm");
         armR = hardwareMap.get(DcMotor.class, "arm2");
@@ -32,7 +33,7 @@ public class Arm {
     }
 
     public void moveArm(int targetPos, double power){
-        if(targetPos <= 0 && targetPos >= -400){
+        if (targetPos <= 0 && targetPos >= -400) {
             armL.setTargetPosition(targetPos);
             armR.setTargetPosition(armL.getTargetPosition());
             armL.setMode(DcMotor.RunMode.RUN_TO_POSITION);

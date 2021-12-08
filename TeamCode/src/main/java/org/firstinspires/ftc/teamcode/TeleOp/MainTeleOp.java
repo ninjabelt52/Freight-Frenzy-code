@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -20,6 +21,7 @@ public class MainTeleOp extends LinearOpMode {
         DcMotorEx duckWheel;
         Servo gate;
         DigitalChannel limit;
+        BNO055IMU imu;
         double straight, strafe, rotation, slowDown = 1, armPower = .5;
         int bottomLimit = 0, armState = 0, targetPos = 0;
         boolean toggle = false;
@@ -34,6 +36,11 @@ public class MainTeleOp extends LinearOpMode {
         armSupport = hardwareMap.get(DcMotor.class, "arm2");
         gate = hardwareMap.get(Servo.class, "gate");
         limit = hardwareMap.get(DigitalChannel.class, "limit");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
 
         fl.setDirection(DcMotorSimple.Direction.REVERSE);
         bl.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -49,6 +56,13 @@ public class MainTeleOp extends LinearOpMode {
         limit.setMode(DigitalChannel.Mode.INPUT);
 
         gate.scaleRange(0,1);
+
+        imu.initialize(parameters);
+
+        while(!isStopRequested() && !imu.isGyroCalibrated()){
+            telemetry.addLine("not initialized");
+            telemetry.update();
+        }
 
         telemetry.addLine("Waiting for start");
         telemetry.update();
@@ -98,7 +112,7 @@ public class MainTeleOp extends LinearOpMode {
                 bottomLimit = arm.getCurrentPosition();
             }
 
-            if(arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0)){
+            if(arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0) && !(imu.getAngularOrientation().thirdAngle < (90 - 15))){
                 arm.setTargetPosition(bottomLimit - 450);
                 armSupport.setTargetPosition(arm.getTargetPosition());
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -147,6 +161,11 @@ public class MainTeleOp extends LinearOpMode {
                 targetPos  = bottomLimit;
             }else if(gamepad1.b && armState == 1){
                 targetPos = bottomLimit - 150;
+            }
+
+            if(imu.getAngularOrientation().thirdAngle < (90 - 15)){
+                targetPos = bottomLimit - 100;
+                armState = 1;
             }
 
             if(gamepad1.y || gamepad1.right_bumper){
