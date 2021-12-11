@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.classes.Arm;
 
-@Autonomous(name = "Get blocks blue")
+@Autonomous(name = "Get blocks blue", group = "Blue")
 public class GetBlocksBlue extends LinearOpMode {
     public void runOpMode(){
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -38,8 +38,8 @@ public class GetBlocksBlue extends LinearOpMode {
         arm.close();
 
         Trajectory collect1 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
-                .splineTo(new Vector2d(29, 65), 0)
-                .lineToLinearHeading(new Pose2d(46, 65, 0))
+                .splineTo(new Vector2d(24, 65), 0)
+                .lineToLinearHeading(new Pose2d(49, 65, 0))
                 .addTemporalMarker(1.5, () -> {
                     arm.moveArm(0, .5);
                     intake.setPower(-1);
@@ -74,8 +74,8 @@ public class GetBlocksBlue extends LinearOpMode {
         arm.close();
 
         Trajectory collect2 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
-                .splineTo(new Vector2d(29, 65), 0)
-                .splineToConstantHeading(new Vector2d(46,60), 0)
+                .splineTo(new Vector2d(24, 65), 0)
+                .splineToConstantHeading(new Vector2d(52,65), 0)
                 .addTemporalMarker(1.5, () -> {
                     arm.moveArm(0, .5);
                     intake.setPower(-1);
@@ -89,8 +89,8 @@ public class GetBlocksBlue extends LinearOpMode {
         sleep(250);
         intake.setPower(1);
 
-        Trajectory backup2 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(24,65, 0))
+        Trajectory backup2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
+                .splineTo(new Vector2d(24,65),Math.toRadians(180))
                 .build();
 
         drive.followTrajectory(backup2);

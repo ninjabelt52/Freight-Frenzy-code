@@ -142,7 +142,7 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setPower(arm.getPower());
             }
 
-            if(gamepad1.a || gamepad1.b){
+            if(gamepad1.a || gamepad1.b || gamepad1.x){
                 if(toggle){
                    armState ++;
                    toggle = false;
@@ -157,10 +157,12 @@ public class MainTeleOp extends LinearOpMode {
 
             if(gamepad1.a && armState == 1){
                 targetPos = bottomLimit - 350;
-            }else if((gamepad1.a || gamepad1.b) && armState == 0){
-                targetPos  = bottomLimit;
+            }else if((gamepad1.a || gamepad1.b || gamepad1.x) && armState == 0){
+                targetPos = bottomLimit;
             }else if(gamepad1.b && armState == 1){
                 targetPos = bottomLimit - 150;
+            }else if(gamepad1.x && armState == 1){
+                targetPos = bottomLimit - 250;
             }
 
             if(imu.getAngularOrientation().thirdAngle < (90 - 15)){
