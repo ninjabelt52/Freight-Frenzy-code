@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -13,18 +14,21 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+@Config
 @TeleOp(name = "Freight Frenzy TeleOp")
 public class MainTeleOp extends LinearOpMode {
+    public static double gateClosed = .25, gateOpen = .35, bottomClosed = .3, bottomOpen = 0;
     public void runOpMode() {
 
         DcMotor bl, br, fl, fr, intake, arm, armSupport;
         DcMotorEx duckWheel;
-        Servo gate;
+        Servo gate, bottom;
         DigitalChannel limit;
         BNO055IMU imu;
         double straight, strafe, rotation, slowDown = 1, armPower = .5;
-        int bottomLimit = 0, armState = 0, targetPos = 0;
-        boolean toggle = false;
+        int bottomLimit = 0, targetPos = 0, level = 3, levelHeight = 350;
+        boolean toggle = false, armState = false, toggle2 = false;
+        String currentTarget = "top";
 
         bl = hardwareMap.get(DcMotor.class, "bl");
         br = hardwareMap.get(DcMotor.class, "br");
@@ -35,6 +39,7 @@ public class MainTeleOp extends LinearOpMode {
         arm = hardwareMap.get(DcMotor.class, "arm");
         armSupport = hardwareMap.get(DcMotor.class, "arm2");
         gate = hardwareMap.get(Servo.class, "gate");
+        bottom = hardwareMap.get(Servo.class, "bottom");
         limit = hardwareMap.get(DigitalChannel.class, "limit");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
@@ -56,6 +61,7 @@ public class MainTeleOp extends LinearOpMode {
         limit.setMode(DigitalChannel.Mode.INPUT);
 
         gate.scaleRange(0,1);
+        bottom.scaleRange(0,1);
 
         imu.initialize(parameters);
 
@@ -68,11 +74,11 @@ public class MainTeleOp extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
 
-            if(gamepad1.dpad_down){
+            if (gamepad1.dpad_down) {
                 slowDown = .5;
-            }else{
+            } else {
                 slowDown = .95;
             }
 
@@ -85,7 +91,7 @@ public class MainTeleOp extends LinearOpMode {
             fl.setPower(straight - strafe + rotation);
             fr.setPower(straight + strafe - rotation);
 
-            if(gamepad2.x){
+            if (gamepad2.x) {
                 //TODO: I think we should investigate this further in the future, but as for now,
                 // competition is next week.
 //                int startPos = duckWheel.getCurrentPosition();
@@ -94,46 +100,46 @@ public class MainTeleOp extends LinearOpMode {
 //                    duckWheel.setVelocity(360, AngleUnit.DEGREES);
 //                }
                 duckWheel.setVelocity(180, AngleUnit.DEGREES);
-            }else if(gamepad2.b){
+            } else if (gamepad2.b) {
                 duckWheel.setVelocity(-180, AngleUnit.DEGREES);
-            }else{
+            } else {
                 duckWheel.setPower(0);
             }
 
-            if(gamepad1.right_bumper){
+            if (gamepad1.right_bumper) {
                 intake.setPower(1);
-            }else if(gamepad1.left_bumper){
+            } else if (gamepad1.left_bumper) {
                 intake.setPower(-1);
-            }else{
+            } else {
                 intake.setPower(0);
             }
 
-            if(!limit.getState()){
+            if (!limit.getState()) {
                 bottomLimit = arm.getCurrentPosition();
             }
 
-            if(arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0) && !(imu.getAngularOrientation().thirdAngle < (90 - 15))){
+            if (arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0) && !(imu.getAngularOrientation().thirdAngle < (90 - 15))) {
                 arm.setTargetPosition(bottomLimit - 450);
                 armSupport.setTargetPosition(arm.getTargetPosition());
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 armSupport.setMode(arm.getMode());
                 arm.setPower(armPower);
                 armSupport.setPower(arm.getPower());
-            }else if(gamepad1.left_trigger > 0 && limit.getState()){
+            } else if (gamepad1.left_trigger > 0 && limit.getState()) {
                 armPower = .25;
                 arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 arm.setPower(gamepad1.left_trigger * armPower);
                 armSupport.setPower(arm.getPower());
                 targetPos = arm.getCurrentPosition();
-            }else if(gamepad1.right_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400){
+            } else if (gamepad1.right_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400) {
                 armPower = .5;
                 arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 arm.setPower(-gamepad1.right_trigger * armPower);
                 armSupport.setPower(arm.getPower());
                 targetPos = arm.getCurrentPosition();
-            }else{
+            } else {
                 arm.setTargetPosition(targetPos);
                 armSupport.setTargetPosition(arm.getTargetPosition());
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -142,50 +148,96 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setPower(arm.getPower());
             }
 
-            if(gamepad1.a || gamepad1.b || gamepad1.x){
+            if (gamepad2.dpad_up) {
+                if (toggle2) {
+                    level++;
+                    toggle2 = false;
+                }
+            }else if (gamepad2.dpad_down){
+                if(toggle2){
+                    level--;
+                    toggle2 = false;
+                }
+            }else{
+                toggle2 = true;
+            }
+
+            if(level > 3){
+                level = 0;
+            }else if(level < 0){
+                level = 3;
+            }
+
+            if(level == 0){
+                levelHeight = 150;
+                currentTarget = "SHARED SHIPPING HUB";
+            }else if(level == 1){
+                levelHeight = 175;
+                currentTarget = "BOTTOM LEVEL";
+            }else if(level == 2){
+                levelHeight = 200;
+                currentTarget = "MIDDLE LEVEL";
+            }else if(level == 3){
+                levelHeight = 350;
+                currentTarget = "TOP LEVEL";
+            }
+
+            if(gamepad1.a){
                 if(toggle){
-                   armState ++;
+                   armState = !armState;
                    toggle = false;
                 }
             }else{
                 toggle = true;
             }
 
-            if(armState > 1){
-                armState = 0;
-            }
-
-            if(gamepad1.a && armState == 1){
-                targetPos = bottomLimit - 350;
-            }else if((gamepad1.a || gamepad1.b || gamepad1.x) && armState == 0){
+            if(armState){
+                targetPos = bottomLimit - levelHeight;
+            }else if(!armState) {
                 targetPos = bottomLimit;
-            }else if(gamepad1.b && armState == 1){
-                targetPos = bottomLimit - 150;
-            }else if(gamepad1.x && armState == 1){
-                targetPos = bottomLimit - 250;
             }
 
             if(imu.getAngularOrientation().thirdAngle < (90 - 15)){
                 targetPos = bottomLimit - 100;
-                armState = 1;
+                armState = true;
             }
 
-            if(gamepad1.y || gamepad1.right_bumper){
-                gate.setPosition(.65);
-            }else{
-                gate.setPosition(.45);
+//            if((arm.getCurrentPosition() <= bottomLimit - 300) && gamepad1.y){
+//                gate.setPosition(.35);
+//                bottom.setPosition(bottomClosed);
+//            }else if(arm.getCurrentPosition() >= bottomLimit - 100 && gamepad1.right_bumper){
+//                gate.setPosition(.35);
+//                bottom.setPosition(bottomClosed);
+//            }else if(bottomLimit - 100 > arm.getCurrentPosition() && arm.getCurrentPosition() > bottomLimit - 300 && gamepad1.y){
+//                bottom.setPosition(bottomOpen);
+//                gate.setPosition(.17);
+//            }else{
+//                bottom.setPosition(bottomClosed);
+//                gate.setPosition(.17);
+//            }
+
+            if(gamepad1.y){
+                bottom.setPosition(bottomOpen);
+                gate.setPosition(gateOpen);
+            }else {
+                bottom.setPosition(bottomClosed);
+                gate.setPosition(gateClosed);
             }
 
-            telemetry.addData("target pos", targetPos);
+//            telemetry.addData("target pos", targetPos);
             telemetry.addData("current pos", arm.getCurrentPosition() - bottomLimit);
-            telemetry.addData("armSupport pos", armSupport.getCurrentPosition());
-            telemetry.addData("left stick y", gamepad1.left_stick_y);
-            telemetry.addData("motor power", intake.getPower());
-            telemetry.addData("duck wheel", duckWheel.getPower());
-            telemetry.addData("touch sensor", limit.getState());
-            telemetry.addData("arm power", arm.getPower());
-            telemetry.addData("armSupport power", arm.getPower());
-            telemetry.addData("armState", armState);
+//            telemetry.addData("armSupport pos", armSupport.getCurrentPosition());
+//            telemetry.addData("left stick y", gamepad1.left_stick_y);
+//            telemetry.addData("motor power", intake.getPower());
+//            telemetry.addData("duck wheel", duckWheel.getPower());
+//            telemetry.addData("touch sensor", limit.getState());
+//            telemetry.addData("arm power", arm.getPower());
+//            telemetry.addData("armSupport power", arm.getPower());
+//            telemetry.addData("armState", armState);
+            telemetry.addData("gate", gate.getPosition());
+            telemetry.addData("level", level);
+            telemetry.addData("toggle2", toggle2);
+            telemetry.addData("target level", currentTarget);
             telemetry.update();
         }
     }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autos.BLUE;
 
+import android.text.Html;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
@@ -19,7 +21,8 @@ public class GetBlocksBlue extends LinearOpMode {
 
         drive.setPoseEstimate(new Pose2d(6.25, 65.38, Math.toRadians(270)));
 
-        telemetry.addLine("waiting for start");
+        String str = "<h1 style=\"text-align: center;\"><strong><span style=\"color: #ff0000;\">RED</span></strong></h1>";
+        telemetry.addData("side", Html.fromHtml(str));
         telemetry.update();
 
         waitForStart();
