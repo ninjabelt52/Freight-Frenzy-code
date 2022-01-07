@@ -97,7 +97,7 @@ public class DuckDetectorPipelineBlue {
 //                e.printStackTrace();
 //            }
 
-            Imgproc.threshold(coi2, threshold, 180, 100, Imgproc.THRESH_TOZERO);
+            Imgproc.threshold(coi2, threshold, 180, 100, Imgproc.THRESH_BINARY);
 
 //            telemetry = "thresholded";
 //

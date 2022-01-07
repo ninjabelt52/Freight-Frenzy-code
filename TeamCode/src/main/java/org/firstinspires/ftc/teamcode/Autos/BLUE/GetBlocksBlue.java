@@ -11,34 +11,61 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.classes.Arm;
+import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineBlue;
 
 @Autonomous(name = "Get blocks blue", group = "Blue")
 public class GetBlocksBlue extends LinearOpMode {
     public void runOpMode(){
+        DuckDetectorPipelineBlue.DuckPos duckPos;
+
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Arm arm = new Arm(hardwareMap);
+        DuckDetectorPipelineBlue detector = new DuckDetectorPipelineBlue(hardwareMap, "Webcam 1");
         DcMotor intake = hardwareMap.get(DcMotor.class, "intake");
 
         drive.setPoseEstimate(new Pose2d(6.25, 65.38, Math.toRadians(270)));
 
-        String str = "<h1 style=\"text-align: center;\"><strong><span style=\"color: #ff0000;\">RED</span></strong></h1>";
-        telemetry.addData("side", Html.fromHtml(str));
-        telemetry.update();
+        Trajectory bottom = drive.trajectoryBuilder(drive.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(-1.89, 39.34, Math.toRadians(52.32)))
+                .addTemporalMarker(1.5, () -> {
+                    arm.moveArm(-200,1);
+                })
+                .build();
 
-        waitForStart();
+        Trajectory middle = drive.trajectoryBuilder(drive.getPoseEstimate())
+                .lineToLinearHeading(new Pose2d(-1.89, 39.34, Math.toRadians(52.32)))
+                .addTemporalMarker(1.5, () -> {
+                    arm.moveArm(-250,1);
+                })
+                .build();
 
-        Trajectory lineUp = drive.trajectoryBuilder(drive.getPoseEstimate())
+        Trajectory top = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(-1.89, 39.34, Math.toRadians(52.32)))
                 .addTemporalMarker(1.5, () -> {
                     arm.moveArm(-350,1);
                 })
                 .build();
 
-        drive.followTrajectory(lineUp);
+        while(!isStarted()) {
+            String str = "<h1 style=\"text-align: center;\"><strong><span style=\"color: #ff0000;\">BLUE</span></strong></h1>";
+            telemetry.addData("side", Html.fromHtml(str));
+            telemetry.addData("webcam telemetry", detector);
+            telemetry.addData("guess", detector.getPosition());
+            telemetry.update();
+        }
 
-        arm.open();
-        sleep(250);
-        arm.close();
+        duckPos = detector.getPosition();
+
+        waitForStart();
+
+        switch (duckPos){
+            case LEFT:
+
+            case CENTER:
+
+            case RIGHT:
+
+        }
 
         Trajectory collect1 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
                 .splineTo(new Vector2d(24, 65), 0)

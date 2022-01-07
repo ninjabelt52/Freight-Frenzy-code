@@ -17,7 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 @TeleOp(name = "Freight Frenzy TeleOp")
 public class MainTeleOp extends LinearOpMode {
-    public static double gateClosed = .25, gateOpen = .35, bottomClosed = .3, bottomOpen = 0;
+    public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .25;
+    public static int BOTTOM = 200, MIDDLE = 250, HIGH = 350;
     public void runOpMode() {
 
         DcMotor bl, br, fl, fr, intake, arm, armSupport;
@@ -25,7 +26,7 @@ public class MainTeleOp extends LinearOpMode {
         Servo gate, bottom;
         DigitalChannel limit;
         BNO055IMU imu;
-        double straight, strafe, rotation, slowDown = 1, armPower = .5;
+        double straight, strafe, rotation, slowDown = 1, armPower = 1;
         int bottomLimit = 0, targetPos = 0, level = 3, levelHeight = 350;
         boolean toggle = false, armState = false, toggle2 = false;
         String currentTarget = "top";
@@ -126,14 +127,14 @@ public class MainTeleOp extends LinearOpMode {
                 arm.setPower(armPower);
                 armSupport.setPower(arm.getPower());
             } else if (gamepad1.left_trigger > 0 && limit.getState()) {
-                armPower = .25;
+                armPower = .5;
                 arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 arm.setPower(gamepad1.left_trigger * armPower);
                 armSupport.setPower(arm.getPower());
                 targetPos = arm.getCurrentPosition();
             } else if (gamepad1.right_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400) {
-                armPower = .5;
+                armPower = 1;
                 arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 arm.setPower(-gamepad1.right_trigger * armPower);
@@ -144,7 +145,7 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setTargetPosition(arm.getTargetPosition());
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 armSupport.setMode(arm.getMode());
-                arm.setPower(.5);
+                arm.setPower(1);
                 armSupport.setPower(arm.getPower());
             }
 
@@ -162,23 +163,20 @@ public class MainTeleOp extends LinearOpMode {
                 toggle2 = true;
             }
 
-            if(level > 3){
+            if(level > 2){
                 level = 0;
             }else if(level < 0){
                 level = 3;
             }
 
             if(level == 0){
-                levelHeight = 150;
-                currentTarget = "SHARED SHIPPING HUB";
-            }else if(level == 1){
-                levelHeight = 175;
+                levelHeight = BOTTOM;
                 currentTarget = "BOTTOM LEVEL";
-            }else if(level == 2){
-                levelHeight = 200;
+            }else if(level == 1){
+                levelHeight = MIDDLE;
                 currentTarget = "MIDDLE LEVEL";
-            }else if(level == 3){
-                levelHeight = 350;
+            }else if(level == 2){
+                levelHeight = HIGH;
                 currentTarget = "TOP LEVEL";
             }
 
@@ -191,9 +189,9 @@ public class MainTeleOp extends LinearOpMode {
                 toggle = true;
             }
 
-            if(armState){
+            if(gamepad1.a && armState){
                 targetPos = bottomLimit - levelHeight;
-            }else if(!armState) {
+            }else if(gamepad1.a && !armState) {
                 targetPos = bottomLimit;
             }
 
@@ -202,27 +200,39 @@ public class MainTeleOp extends LinearOpMode {
                 armState = true;
             }
 
-//            if((arm.getCurrentPosition() <= bottomLimit - 300) && gamepad1.y){
-//                gate.setPosition(.35);
-//                bottom.setPosition(bottomClosed);
-//            }else if(arm.getCurrentPosition() >= bottomLimit - 100 && gamepad1.right_bumper){
-//                gate.setPosition(.35);
-//                bottom.setPosition(bottomClosed);
-//            }else if(bottomLimit - 100 > arm.getCurrentPosition() && arm.getCurrentPosition() > bottomLimit - 300 && gamepad1.y){
-//                bottom.setPosition(bottomOpen);
-//                gate.setPosition(.17);
-//            }else{
-//                bottom.setPosition(bottomClosed);
-//                gate.setPosition(.17);
-//            }
-
-            if(gamepad1.y){
-                bottom.setPosition(bottomOpen);
+            if((arm.getCurrentPosition() <= bottomLimit - 300) && gamepad1.y){
                 gate.setPosition(gateOpen);
-            }else {
+                bottom.setPosition(bottomClosed);
+            }else if(arm.getCurrentPosition() >= bottomLimit - 100 && (gamepad1.right_bumper || gamepad1.y)){
+                gate.setPosition(gateOpen);
+                bottom.setPosition(bottomClosed);
+            }else if(bottomLimit - 150 > arm.getCurrentPosition() && arm.getCurrentPosition() > bottomLimit - 300 && gamepad1.y){
+                bottom.setPosition(bottomOpen);
+                gate.setPosition(quasiGateOpen);
+            }else{
                 bottom.setPosition(bottomClosed);
                 gate.setPosition(gateClosed);
             }
+
+//            if(gamepad1.x){
+//                gate.setPosition(gateOpen);
+//            }else{
+//                gate.setPosition(gateClosed);
+//            }
+//
+//            if(gamepad1.b){
+//                bottom.setPosition(bottomOpen);
+//            }else{
+//                gate.setPosition(bottomClosed);
+//            }
+
+//            if(gamepad1.y){
+//                bottom.setPosition(bottomOpen);
+//                gate.setPosition(gateOpen);
+//            }else {
+//                bottom.setPosition(bottomClosed);
+//                gate.setPosition(gateClosed);
+//            }
 
 //            telemetry.addData("target pos", targetPos);
             telemetry.addData("current pos", arm.getCurrentPosition() - bottomLimit);
