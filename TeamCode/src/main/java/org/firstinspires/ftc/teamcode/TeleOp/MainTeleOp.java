@@ -17,8 +17,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 @TeleOp(name = "Freight Frenzy TeleOp")
 public class MainTeleOp extends LinearOpMode {
-    public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .25;
-    public static int BOTTOM = 200, MIDDLE = 250, HIGH = 350;
+    public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .1;
+    public static int SHARED = 175, BOTTOM = 175, MIDDLE = 250, HIGH = 350;
     public void runOpMode() {
 
         DcMotor bl, br, fl, fr, intake, arm, armSupport;
@@ -27,8 +27,8 @@ public class MainTeleOp extends LinearOpMode {
         DigitalChannel limit;
         BNO055IMU imu;
         double straight, strafe, rotation, slowDown = 1, armPower = 1;
-        int bottomLimit = 0, targetPos = 0, level = 3, levelHeight = 350;
-        boolean toggle = false, armState = false, toggle2 = false;
+        int bottomLimit = 0, targetPos = 0, level = 0, levelHeight = 350;
+        boolean toggle = false, armState = false, toggle2 = false, toggle3 = false;
         String currentTarget = "top";
 
         bl = hardwareMap.get(DcMotor.class, "bl");
@@ -134,7 +134,7 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setPower(arm.getPower());
                 targetPos = arm.getCurrentPosition();
             } else if (gamepad1.right_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400) {
-                armPower = 1;
+                armPower = .5;
                 arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 arm.setPower(-gamepad1.right_trigger * armPower);
@@ -145,7 +145,7 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setTargetPosition(arm.getTargetPosition());
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 armSupport.setMode(arm.getMode());
-                arm.setPower(1);
+                arm.setPower(.5);
                 armSupport.setPower(arm.getPower());
             }
 
@@ -154,30 +154,57 @@ public class MainTeleOp extends LinearOpMode {
                     level++;
                     toggle2 = false;
                 }
-            }else if (gamepad2.dpad_down){
-                if(toggle2){
+            } else if (gamepad2.dpad_down) {
+                if (toggle2) {
                     level--;
                     toggle2 = false;
                 }
-            }else{
+            } else {
                 toggle2 = true;
             }
 
-            if(level > 2){
+            if (level > 3) {
                 level = 0;
-            }else if(level < 0){
+            } else if (level < 0) {
                 level = 3;
             }
 
-            if(level == 0){
+            if(level == 0) {
+                levelHeight = SHARED;
+                currentTarget = "SHARED SHIPPING HUB";
+            }else if(level == 1){
                 levelHeight = BOTTOM;
                 currentTarget = "BOTTOM LEVEL";
-            }else if(level == 1){
+            }else if(level == 2){
                 levelHeight = MIDDLE;
                 currentTarget = "MIDDLE LEVEL";
-            }else if(level == 2){
+            }else if(level == 3){
                 levelHeight = HIGH;
                 currentTarget = "TOP LEVEL";
+            }
+
+            if(gamepad2.right_bumper){
+                if(toggle3){
+                    SHARED += 10;
+                    toggle3 = false;
+                }
+            }else if(gamepad2.left_bumper){
+                if(toggle3){
+                    SHARED -= 10;
+                    toggle3 = false;
+                }
+            }else if(gamepad2.right_trigger > 0){
+                if(toggle3){
+                    SHARED += 20;
+                    toggle3 = false;
+                }
+            }else if(gamepad2.left_trigger > 0){
+                if(toggle3){
+                    SHARED -= 20;
+                    toggle3 = false;
+                }
+            }else{
+                toggle3 = true;
             }
 
             if(gamepad1.a){
@@ -202,37 +229,41 @@ public class MainTeleOp extends LinearOpMode {
 
             if((arm.getCurrentPosition() <= bottomLimit - 300) && gamepad1.y){
                 gate.setPosition(gateOpen);
-                bottom.setPosition(bottomClosed);
+
+                if(gamepad1.b){
+                    bottom.setPosition(bottomOpen);
+                }else {
+                    bottom.setPosition(bottomClosed);
+                }
             }else if(arm.getCurrentPosition() >= bottomLimit - 100 && (gamepad1.right_bumper || gamepad1.y)){
                 gate.setPosition(gateOpen);
-                bottom.setPosition(bottomClosed);
-            }else if(bottomLimit - 150 > arm.getCurrentPosition() && arm.getCurrentPosition() > bottomLimit - 300 && gamepad1.y){
+
+                if(gamepad1.b){
+                    bottom.setPosition(bottomOpen);
+                }else {
+                    bottom.setPosition(bottomClosed);
+                }
+            }else if(bottomLimit - 100 > arm.getCurrentPosition() && arm.getCurrentPosition() > bottomLimit - 300 && gamepad1.y){
                 bottom.setPosition(bottomOpen);
-                gate.setPosition(quasiGateOpen);
+
+                if(gamepad1.x){
+                    gate.setPosition(gateOpen);
+                }else{
+                    gate.setPosition(quasiGateOpen);
+                }
             }else{
-                bottom.setPosition(bottomClosed);
-                gate.setPosition(gateClosed);
+                if(gamepad1.b){
+                    bottom.setPosition(bottomOpen);
+                }else {
+                    bottom.setPosition(bottomClosed);
+                }
+
+                if(gamepad1.x){
+                    gate.setPosition(gateOpen);
+                }else{
+                    gate.setPosition(gateClosed);
+                }
             }
-
-//            if(gamepad1.x){
-//                gate.setPosition(gateOpen);
-//            }else{
-//                gate.setPosition(gateClosed);
-//            }
-//
-//            if(gamepad1.b){
-//                bottom.setPosition(bottomOpen);
-//            }else{
-//                gate.setPosition(bottomClosed);
-//            }
-
-//            if(gamepad1.y){
-//                bottom.setPosition(bottomOpen);
-//                gate.setPosition(gateOpen);
-//            }else {
-//                bottom.setPosition(bottomClosed);
-//                gate.setPosition(gateClosed);
-//            }
 
 //            telemetry.addData("target pos", targetPos);
             telemetry.addData("current pos", arm.getCurrentPosition() - bottomLimit);
@@ -244,6 +275,7 @@ public class MainTeleOp extends LinearOpMode {
 //            telemetry.addData("arm power", arm.getPower());
 //            telemetry.addData("armSupport power", arm.getPower());
 //            telemetry.addData("armState", armState);
+            telemetry.addData("SHARED HEIGHT", SHARED);
             telemetry.addData("gate", gate.getPosition());
             telemetry.addData("level", level);
             telemetry.addData("toggle2", toggle2);

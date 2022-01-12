@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineRed;
 @TeleOp
 public class DuckDetectorTest extends LinearOpMode {
     public void runOpMode(){
-        DuckDetectorPipelineRed pipeline = new DuckDetectorPipelineRed(hardwareMap, "Webcam 1");
+        DuckDetectorPipelineBlue pipeline = new DuckDetectorPipelineBlue(hardwareMap, "Webcam 1");
 
         while(!isStarted()){
             telemetry.addData("pipeline telemetry", pipeline);

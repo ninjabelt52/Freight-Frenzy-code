@@ -22,7 +22,10 @@ public class DuckDetectorPipelineBlue {
     Threshold thresh;
     String telemetry = "waiting for input";
     DuckPos position;
-    public static int middleX = 130;
+    public static Rect right = new Rect(185,100,25,25);
+    public static Rect middle = new Rect(50,110,25,25);
+    public static int threshVal = 128;
+    public static int filterVal = 10;
 
 
     public DuckDetectorPipelineBlue(HardwareMap hardwareMap, String camName){
@@ -97,7 +100,7 @@ public class DuckDetectorPipelineBlue {
 //                e.printStackTrace();
 //            }
 
-            Imgproc.threshold(coi2, threshold, 180, 100, Imgproc.THRESH_BINARY);
+            Imgproc.threshold(coi2, threshold, threshVal, 255, Imgproc.THRESH_BINARY);
 
 //            telemetry = "thresholded";
 //
@@ -108,8 +111,8 @@ public class DuckDetectorPipelineBlue {
 //            }
 
 
-            Imgproc.rectangle(threshold, new Point(0,0),new Point(middleX,240),new Scalar(255,0,0), 2);
-            Imgproc.rectangle(threshold, new Point(middleX,0),new Point(260,240),new Scalar(255,0,0), 2);
+            Imgproc.rectangle(threshold, middle,new Scalar(255,0,0), 2);
+            Imgproc.rectangle(threshold, right,new Scalar(255,0,0), 2);
 
 //            telemetry = "drew rectangles";
 //
@@ -119,8 +122,8 @@ public class DuckDetectorPipelineBlue {
 //                e.printStackTrace();
 //            }
 
-            Mat section1 = threshold.submat(new Rect(new Point(0,0), new Point(middleX,240)));
-            Mat section2 = threshold.submat(new Rect(new Point(middleX,0), new Point(260,240)));
+            Mat section1 = threshold.submat(middle);
+            Mat section2 = threshold.submat(right);
 
 //            telemetry = "created sections";
 //
@@ -142,32 +145,13 @@ public class DuckDetectorPipelineBlue {
 //                e.printStackTrace();
 //            }
 
-
-//            if(avg1 > avg2){
-//                if(avg1 > avg3){
-//                    position = DuckPos.LEFT;
-//                    Imgproc.rectangle(threshold, new Point(0,0),new Point(106,240),new Scalar(255,0,0), -1);
-//                }else{
-//                    position = DuckPos.RIGHT;
-//                    Imgproc.rectangle(threshold, new Point(212,0),new Point(318,240),new Scalar(255,0,0), -1);
-//                }
-//            }else{
-//                if(avg2 > avg3){
-//                    position = DuckPos.CENTER;
-//                    Imgproc.rectangle(threshold, new Point(106,0),new Point(212,240),new Scalar(255,0,0), -1);
-//                }else{
-//                    position = DuckPos.RIGHT;
-//                    Imgproc.rectangle(threshold, new Point(212,0),new Point(318,240),new Scalar(255,0,0), -1);
-//                }
-//            }
-
-            if(Math.abs(avg1 - avg2) >= 3) {
+            if(Math.abs(avg1 - avg2) >= filterVal) {
                 if (avg1 > avg2) {
                     position = DuckPos.CENTER;
-                    Imgproc.rectangle(threshold, new Point(0, 0), new Point(middleX, 240), new Scalar(255, 0, 0), -1);
+                    Imgproc.rectangle(threshold,middle, new Scalar(255, 0, 0), -1);
                 } else {
                     position = DuckPos.RIGHT;
-                    Imgproc.rectangle(threshold, new Point(middleX, 0), new Point(260, 240), new Scalar(255, 0, 0), -1);
+                    Imgproc.rectangle(threshold, right, new Scalar(255, 0, 0), -1);
                 }
             }else{
                 position = DuckPos.LEFT;
@@ -176,22 +160,26 @@ public class DuckDetectorPipelineBlue {
             switch (stage){
                 case 0:
                     telemetry = "active stage is ycrcb" + "\navg 1: " + avg1 + "\navg 2: " + avg2;
-                    Imgproc.line(ycrcb, new Point(middleX, 0), new Point(middleX, 260), new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(ycrcb, middle,new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(ycrcb, right,new Scalar(255,0,0), 2);
                     return ycrcb;
                 case 1:
                     telemetry = "active stage is coi" + "\navg 1: " + avg1 + "\navg 2: " + avg2;
-                    Imgproc.line(coi2, new Point(middleX, 0), new Point(middleX, 260), new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(coi2, middle,new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(coi2, right,new Scalar(255,0,0), 2);
                     return coi2;
                 case 2:
                     telemetry = "active stage is threshold" + "\navg 1: " + avg1 + "\navg 2: " + avg2;
                     return threshold;
                 case 3:
                     telemetry = "active stage is input" + "\navg 1: " + avg1 + "\navg 2: " + avg2;
-                    Imgproc.line(input, new Point(middleX, 0), new Point(middleX, 260), new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(input, middle,new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(input, right,new Scalar(255,0,0), 2);
                     return input;
                 default:
                     telemetry = "active stage is input" + "\navg 1: " + avg1 + "\navg 2: " + avg2;
-                    Imgproc.line(input, new Point(middleX, 0), new Point(middleX, 260), new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(input, middle,new Scalar(255,0,0), 2);
+                    Imgproc.rectangle(input, right,new Scalar(255,0,0), 2);
                     return  input;
             }
         }

@@ -7,12 +7,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Arm {
     private DcMotor armL, armR;
-    private Servo gate;
+    private Servo gate, bottom;
 
     public Arm (HardwareMap hardwareMap){
         armL = hardwareMap.get(DcMotor.class, "arm");
         armR = hardwareMap.get(DcMotor.class, "arm2");
         gate = hardwareMap.get(Servo.class, "gate");
+        bottom = hardwareMap.get(Servo.class, "bottom");
 
         armR.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -22,7 +23,8 @@ public class Arm {
         armL.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        gate.setPosition(.45);
+        gate.setPosition(.1);
+        bottom.setPosition(1);
 
         armL.setTargetPosition(0);
         armR.setTargetPosition(armL.getTargetPosition());
@@ -44,10 +46,25 @@ public class Arm {
     }
 
     public void open(){
-        gate.setPosition(1);
+        if(armL.getCurrentPosition() <= -300){
+            gate.setPosition(.37);
+            bottom.setPosition(1);
+        }else if(armL.getCurrentPosition() >= -100){
+            gate.setPosition(.37);
+            bottom.setPosition(1);
+        }else if(-100 > armL.getCurrentPosition() && armL.getCurrentPosition() > -300){
+            bottom.setPosition(0);
+            gate.setPosition(.1);
+        }
+    }
+
+    public void open(double gatePos, double bottomPos){
+        gate.setPosition(gatePos);
+        bottom.setPosition(bottomPos);
     }
 
     public void close(){
-        gate.setPosition(.45);
+        gate.setPosition(.1);
+        bottom.setPosition(1);
     }
 }
