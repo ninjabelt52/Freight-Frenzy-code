@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 @TeleOp(name = "Freight Frenzy TeleOp")
 public class MainTeleOp extends LinearOpMode {
-    public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .1;
+    public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2;
     public static int SHARED = 175, BOTTOM = 175, MIDDLE = 250, HIGH = 350;
     public void runOpMode() {
 

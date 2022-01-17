@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.classes.Arm;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineBlue;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineRed;
 
-@Autonomous(name = "New Get blocks red", group = "Red")
+@Autonomous(name = "Get blocks red", group = "Red")
 public class ModifiedGetBlocksRed extends LinearOpMode {
     public void runOpMode(){
         DuckDetectorPipelineRed.DuckPos duckPos;
@@ -42,7 +42,7 @@ public class ModifiedGetBlocksRed extends LinearOpMode {
                     arm.moveArm(-250,1);
                 })
                 .addTemporalMarker(2, () ->{
-                    arm.open();
+                    arm.open(.25,0);
                 })
                 .build();
 
@@ -73,7 +73,7 @@ public class ModifiedGetBlocksRed extends LinearOpMode {
             sleep(250);
         }else if(duckPos.equals(DuckDetectorPipelineRed.DuckPos.CENTER)){
             drive.followTrajectory(middle);
-            sleep(500);
+            sleep(1000);
             arm.open(.1,0);
             sleep(500);
             arm.close();
