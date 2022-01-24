@@ -9,16 +9,19 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 @TeleOp(name = "Freight Frenzy TeleOp")
 public class MainTeleOp extends LinearOpMode {
-    public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2;
-    public static int SHARED = 175, BOTTOM = 175, MIDDLE = 250, HIGH = 350;
+    public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2, straight, strafe, rotation;
+    public static int SHARED = 175, BOTTOM = 175, MIDDLE = 250, HIGH = 350,  targetPos = 0;
+
     public void runOpMode() {
 
         DcMotor bl, br, fl, fr, intake, arm, armSupport;
@@ -26,10 +29,26 @@ public class MainTeleOp extends LinearOpMode {
         Servo gate, bottom;
         DigitalChannel limit;
         BNO055IMU imu;
-        double straight, strafe, rotation, slowDown = 1, armPower = 1;
-        int bottomLimit = 0, targetPos = 0, level = 0, levelHeight = 350;
+        double slowDown = 1, armPower = 1;
+        int bottomLimit = 0, level = 0, levelHeight = 350;
         boolean toggle = false, armState = false, toggle2 = false, toggle3 = false;
+        boolean rumble1 = true, rumble2 = true, rumble3 = true;
         String currentTarget = "top";
+
+        ElapsedTime timer = new ElapsedTime();
+        Gamepad.RumbleEffect fastBlip;
+
+        fastBlip = new Gamepad.RumbleEffect.Builder()
+                .addStep(1,1,150)
+                .addStep(0,0,50)
+                .addStep(1,1,150)
+                .addStep(0,0,50)
+                .addStep(1,1,150)
+                .addStep(0,0,50)
+                .addStep(1,1,150)
+                .addStep(0,0,50)
+                .addStep(1,1,150)
+                .build();
 
         bl = hardwareMap.get(DcMotor.class, "bl");
         br = hardwareMap.get(DcMotor.class, "br");
@@ -75,7 +94,19 @@ public class MainTeleOp extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+        timer.reset();
         while (opModeIsActive()) {
+
+            if(rumble1 && timer.seconds() >= 75){
+                gamepad1.rumble(500);
+                rumble1 = false;
+            }else if(rumble2 && timer.seconds() >= 85){
+                gamepad1.runRumbleEffect(fastBlip);
+                rumble2 = false;
+            }else if(rumble3 && timer.seconds() >= 115){
+                gamepad1.runRumbleEffect(fastBlip);
+                rumble3 = false;
+            }
 
             if (gamepad1.dpad_down) {
                 slowDown = .5;
@@ -280,6 +311,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("level", level);
             telemetry.addData("toggle2", toggle2);
             telemetry.addData("target level", currentTarget);
+            telemetry.addData("time", (int)timer.seconds());
             telemetry.update();
         }
     }
