@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,33 +10,29 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
-@TeleOp(name = "Freight Frenzy TeleOp")
-public class MainTeleOp extends LinearOpMode {
+@TeleOp(name = "Demo Op Mode")
+public class DemoOpMode extends LinearOpMode {
     public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2, straight, strafe, rotation;
-    public static int BOTTOM = 175, MIDDLE = 250, HIGH = 350,  targetPos = 0;
-    public int SHARED = 175;
+    public static int SHARED = 175, BOTTOM = 175, MIDDLE = 250, HIGH = 350,  targetPos = 0;
 
     public void runOpMode() {
 
-        DcMotor bl, br, fl, fr, intake, arm, armSupport;
+        DcMotor intake, arm, armSupport;
         DcMotorEx duckWheel;
         Servo gate, bottom;
         DigitalChannel limit;
         BNO055IMU imu;
         double slowDown = 1, armPower = 1;
         int bottomLimit = 0, level = 0, levelHeight = 350;
-        boolean toggle = false, armState = false, toggle2 = false, toggle3 = false;
-        boolean rumble1 = true, rumble2 = true, rumble3 = true;
+        boolean toggle = false, armState = false, toggle2 = false, toggle3 = false, toggle4 = false, activatedArm = true;
+        boolean toggle5 = false, armOn = true;
         String currentTarget = "top";
 
-        ElapsedTime timer = new ElapsedTime();
         Gamepad.RumbleEffect fastBlip;
 
         fastBlip = new Gamepad.RumbleEffect.Builder()
@@ -53,10 +47,6 @@ public class MainTeleOp extends LinearOpMode {
                 .addStep(1,1,150)
                 .build();
 
-        bl = hardwareMap.get(DcMotor.class, "bl");
-        br = hardwareMap.get(DcMotor.class, "br");
-        fl = hardwareMap.get(DcMotor.class, "fl");
-        fr = hardwareMap.get(DcMotor.class, "fr");
         intake = hardwareMap.get(DcMotor.class, "intake");
         duckWheel = hardwareMap.get(DcMotorEx.class, "Rim");
         arm = hardwareMap.get(DcMotor.class, "arm");
@@ -70,13 +60,9 @@ public class MainTeleOp extends LinearOpMode {
 
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
 
-        fl.setDirection(DcMotorSimple.Direction.REVERSE);
-        bl.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
         armSupport.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armSupport.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         duckWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -97,35 +83,10 @@ public class MainTeleOp extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
-        timer.reset();
         while (opModeIsActive()) {
-
-            if(rumble1 && timer.seconds() >= 75){
-                gamepad1.rumble(500);
-                rumble1 = false;
-            }else if(rumble2 && timer.seconds() >= 85){
+            if(gamepad1.dpad_right){
                 gamepad1.runRumbleEffect(fastBlip);
-                rumble2 = false;
-            }else if(rumble3 && timer.seconds() >= 115){
-                gamepad1.runRumbleEffect(fastBlip);
-                rumble3 = false;
             }
-
-            if (gamepad1.dpad_down) {
-                slowDown = .5;
-            } else {
-                slowDown = .95;
-            }
-
-            straight = gamepad1.left_stick_y * slowDown;
-            strafe = (gamepad1.left_stick_x * slowDown);
-            rotation = gamepad1.right_stick_x * slowDown * .5;
-
-            bl.setPower(straight + strafe + rotation);
-            br.setPower(straight - strafe - rotation);
-            fl.setPower(straight - strafe + rotation);
-            fr.setPower(straight + strafe - rotation);
-
             if (gamepad2.x) {
                 //TODO: I think we should investigate this further in the future, but as for now,
                 // competition is next week.
@@ -175,20 +136,36 @@ public class MainTeleOp extends LinearOpMode {
                 armSupport.setPower(arm.getPower());
                 targetPos = arm.getCurrentPosition();
             } else {
-                arm.setTargetPosition(targetPos);
-                armSupport.setTargetPosition(arm.getTargetPosition());
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armSupport.setMode(arm.getMode());
-                arm.setPower(.5);
-                armSupport.setPower(arm.getPower());
+                if(armOn) {
+                    arm.setTargetPosition(targetPos);
+                    armSupport.setTargetPosition(arm.getTargetPosition());
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armSupport.setMode(arm.getMode());
+                    arm.setPower(.5);
+                    armSupport.setPower(arm.getPower());
+                }else{
+                    arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    arm.setPower(0);
+                    armSupport.setPower(0);
+                }
             }
 
-            if (gamepad2.dpad_up) {
+            if(gamepad1.left_stick_button){
+                if(toggle5){
+                    armOn = !armOn;
+                    toggle5 = false;
+                }
+            }else{
+                toggle5 = true;
+            }
+
+            if (gamepad1.dpad_up) {
                 if (toggle2) {
                     level++;
                     toggle2 = false;
                 }
-            } else if (gamepad2.dpad_down) {
+            } else if (gamepad1.dpad_down) {
                 if (toggle2) {
                     level--;
                     toggle2 = false;
@@ -241,7 +218,7 @@ public class MainTeleOp extends LinearOpMode {
                 toggle3 = true;
             }
 
-            if(gamepad1.a){
+            if(gamepad1.a && !(gamepad1.options || gamepad2.options)){
                 if(toggle){
                    armState = !armState;
                    toggle = false;
@@ -256,7 +233,16 @@ public class MainTeleOp extends LinearOpMode {
                 targetPos = bottomLimit;
             }
 
-            if(imu.getAngularOrientation().thirdAngle < (90 - 15)){
+            if(gamepad1.dpad_left){
+                if(toggle4){
+                    activatedArm = !activatedArm;
+                    toggle4 = false;
+                }
+            }else{
+                toggle4 = true;
+            }
+
+            if((imu.getAngularOrientation().thirdAngle < (90 - 15)) && activatedArm){
                 targetPos = bottomLimit - 100;
                 armState = true;
             }
@@ -314,7 +300,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("level", level);
             telemetry.addData("toggle2", toggle2);
             telemetry.addData("target level", currentTarget);
-            telemetry.addData("time", (int)timer.seconds());
+            telemetry.addLine("ARM WILL " + (activatedArm ? "OPEN WHEN TILTED" : "NOT OPEN WHEN TILTED"));
             telemetry.update();
         }
     }

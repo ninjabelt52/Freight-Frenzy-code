@@ -23,7 +23,7 @@ public class GetBlocksBlue extends LinearOpMode {
         DuckDetectorPipelineBlue detector = new DuckDetectorPipelineBlue(hardwareMap, "Webcam 1");
         DcMotor intake = hardwareMap.get(DcMotor.class, "intake");
 
-        drive.setPoseEstimate(new Pose2d(6.25, 65.38, Math.toRadians(270)));
+        drive.setPoseEstimate(new Pose2d(6.25, 64.88, Math.toRadians(270)));
 
         Trajectory bottom = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .lineToLinearHeading(new Pose2d(1.75, 44.93, Math.toRadians(56.35)))
