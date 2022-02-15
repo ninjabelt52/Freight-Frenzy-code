@@ -315,6 +315,7 @@ public class MainTeleOp extends LinearOpMode {
             telemetry.addData("toggle2", toggle2);
             telemetry.addData("target level", currentTarget);
             telemetry.addData("time", (int)timer.seconds());
+            telemetry.addData("gyro reading", imu.getAngularOrientation().thirdAngle);
             telemetry.update();
         }
     }
