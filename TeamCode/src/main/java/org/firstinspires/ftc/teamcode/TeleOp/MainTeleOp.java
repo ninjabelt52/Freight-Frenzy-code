@@ -114,12 +114,12 @@ public class MainTeleOp extends LinearOpMode {
             if (gamepad1.dpad_down) {
                 slowDown = .5;
             } else {
-                slowDown = .95;
+                slowDown = 1;
             }
 
             straight = gamepad1.left_stick_y * slowDown;
             strafe = (gamepad1.left_stick_x * slowDown);
-            rotation = gamepad1.right_stick_x * slowDown * .5;
+            rotation = gamepad1.right_stick_x * slowDown;
 
             bl.setPower(straight + strafe + rotation);
             br.setPower(straight - strafe - rotation);

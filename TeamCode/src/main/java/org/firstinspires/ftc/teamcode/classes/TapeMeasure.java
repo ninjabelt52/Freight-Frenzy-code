@@ -14,12 +14,13 @@ public class TapeMeasure implements Runnable{
 
     private Servo liftL, liftR, zAxis, xAxis;
     private CRServo  feed;
-    public static double liftInit = 0, zInit = 0, xInit = 0;
-    public static double liftOpen = 1, xOpen = 1;
-    public static double targetX = 36, targetY = 36;
-    public static double leftBound = 0, rightBound = 1;
-    private double lastAngle = 0, globalAngle = 0, baseAngle = 0;
-    private boolean toggle;
+    public static double liftInit = 0, zInit = 0, xInit = 1;
+    public static double liftOpen = 1, xOpen = .53;
+    public static double targetX = -36, targetY = -36;
+    public static double leftBound = 0, rightBound = 1, bottomBound = 0, topBound = .5;
+    private double lastAngle = 0, globalAngle = 0, baseAngle = 0, targetXAxis, slowSpeed;
+    public static double targetZ;
+    private boolean toggle = false;
     BNO055IMU imu;
     private boolean isOpen = false;
     Gamepad gamepad1;
@@ -40,11 +41,13 @@ public class TapeMeasure implements Runnable{
         imu.initialize(parameters);
 
         zAxis.scaleRange(leftBound, rightBound);
+        liftL.scaleRange(0, .37);
+        liftR.scaleRange(0, .33);
 
         gamepad1 = gamepadOne;
 
-        liftL.setPosition(liftInit);
-        liftR.setPosition(liftInit);
+        liftL.setPosition(0);
+        liftR.setPosition(1);
         zAxis.setPosition(zInit);
         xAxis.setPosition(xInit);
 
@@ -56,17 +59,42 @@ public class TapeMeasure implements Runnable{
     }
 
     public void open (){
-        liftL.setPosition(liftOpen);
-        liftR.setPosition(liftOpen);
+        liftL.setPosition(1);
+        liftR.setPosition(0);
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         xAxis.setPosition(xOpen);
-        zAxis.setPosition(Math.atan2(targetX, targetY) - robotRotation() / 180);
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        zAxis.setPosition(1 - Math.atan2(targetY, targetX) - robotRotation() / 180);
+        targetZ = zAxis.getPosition();
+        targetXAxis = xAxis.getPosition();
         isOpen = true;
     }
 
     public void close(){
-        liftL.setPosition(liftInit);
-        liftR.setPosition(liftInit);
+        zAxis.setPosition(zInit);
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         xAxis.setPosition(xInit);
+        try {
+            Thread.sleep(250);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        liftL.setPosition(0);
+        liftR.setPosition(1);
+        targetZ = zAxis.getPosition();
+        targetXAxis = xAxis.getPosition();
         isOpen = false;
     }
 
@@ -87,7 +115,7 @@ public class TapeMeasure implements Runnable{
     }
 
     public double robotRotation(){
-        double heading = imu.getAngularOrientation().secondAngle;
+        double heading = imu.getAngularOrientation().firstAngle;
 
         double deltaAngle = heading - lastAngle;
 
@@ -126,14 +154,37 @@ public class TapeMeasure implements Runnable{
 //          TODO: Need to add code that will only extend the tape when the system is up,
 //            and only retract the tape otherwise.
             if(gamepad1.dpad_up){
-                extend(1);
-            }else if(gamepad1.dpad_down){
                 extend(-1);
+            }else if(gamepad1.dpad_down){
+                extend(1);
             }else{
                 extend(0);
             }
 
-            telemetry = "" + robotRotation();
+            if(isOpen) {
+                targetZ += gamepad1.right_stick_x * .0003 * slowSpeed;
+                targetXAxis += -gamepad1.right_stick_y * .0003 * slowSpeed;
+
+                if(gamepad1.left_trigger > 0){
+                    slowSpeed = .5;
+                }else{
+                    slowSpeed = 1;
+                }
+
+//                if(targetZ > 1)
+//                    targetZ = 1;
+//                if(targetZ > 0)
+//                    targetZ = 0;
+//                if(targetXAxis > 1)
+//                    targetXAxis = 1;
+//                if(targetXAxis < 0)
+//                    targetXAxis = 0;
+
+                zAxis.setPosition(targetZ);
+                xAxis.setPosition(targetXAxis);
+            }
+
+            telemetry = "" + robotRotation() + "\nTarget value: " + (Math.atan2(targetY, targetX));
         }
     }
 }

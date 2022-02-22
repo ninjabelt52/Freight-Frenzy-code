@@ -1,8 +1,8 @@
 ---
 startPose:
-  x: -41.38
-  y: 65.75
-  heading: 3.141592653589793
+  x: -41.75
+  y: 65.375
+  heading: 4.71238898038469
 startTangent: 0.0
 waypoints:
 - position:

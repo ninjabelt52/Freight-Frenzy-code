@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.classes.Arm;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineBlue;
 
-@Autonomous(name = "Get blocks blue", group = "Blue")
-public class GetBlocksBlue extends LinearOpMode {
+@Autonomous(name = "Get blocks blue park back", group = "Blue")
+public class GetBlocksBlueBackPark extends LinearOpMode {
     public void runOpMode(){
         DuckDetectorPipelineBlue.DuckPos duckPos;
 
@@ -97,24 +97,19 @@ public class GetBlocksBlue extends LinearOpMode {
 
         drive.followTrajectory(collect1);
 
-        Trajectory backup1 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .lineToLinearHeading(new Pose2d(24,65, 0))
+        Trajectory deliver1 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
+                .splineTo(new Vector2d(24,65),Math.toRadians(180))
+                .splineTo(new Vector2d(-.89, 41.34), Math.toRadians(232.32))
                 .addTemporalMarker(0, () ->{
                     arm.close();
                 })
                 .addTemporalMarker(.25, () ->{
                     intake.setPower(1);
                 })
-                .build();
-
-        drive.followTrajectory(backup1);
-
-        Trajectory deliver1 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                .splineTo(new Vector2d(-.89, 41.34), Math.toRadians(232.32))
-                .addTemporalMarker(.5, () ->{
+                .addTemporalMarker(1, () ->{
                     arm.moveArm(-350, 1);
                 })
-                .addTemporalMarker(1.5, () -> {
+                .addTemporalMarker(2, () -> {
                     intake.setPower(0);
                 })
                 .build();
@@ -150,11 +145,18 @@ public class GetBlocksBlue extends LinearOpMode {
         drive.followTrajectory(backup2);
 
         Trajectory deliver2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
+                .splineTo(new Vector2d(24,65),Math.toRadians(180))
                 .splineTo(new Vector2d(-.89, 41.34), Math.toRadians(232.32))
-                .addTemporalMarker(.5, () ->{
+                .addTemporalMarker(0, () ->{
+                    arm.close();
+                })
+                .addTemporalMarker(.25, () -> {
+                    intake.setPower(1);
+                })
+                .addTemporalMarker(1, () ->{
                     arm.moveArm(-350, 1);
                 })
-                .addTemporalMarker(1.5, () -> {
+                .addTemporalMarker(2, () -> {
                     intake.setPower(0);
                 })
                 .build();
@@ -167,7 +169,9 @@ public class GetBlocksBlue extends LinearOpMode {
 
         Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
                 .splineTo(new Vector2d(24, 65), 0)
-                .lineToLinearHeading(new Pose2d(43.38, 65, 0))
+                .splineTo(new Vector2d(43.38, 65), 0)
+                .splineTo(new Vector2d(43.38, 41), 0)
+                .splineToConstantHeading(new Vector2d(65,41), Math.toRadians(90))
                 .addTemporalMarker(2, () -> {
                     arm.moveArm(0, .5);
                     intake.setPower(-1);
