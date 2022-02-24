@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 
 @Config
 @TeleOp(name = "Freight Frenzy TeleOp")
@@ -37,6 +38,8 @@ public class MainTeleOp extends LinearOpMode {
         boolean toggle = false, armState = false, toggle2 = false, toggle3 = false;
         boolean rumble1 = true, rumble2 = true, rumble3 = true;
         String currentTarget = "top";
+        TapeMeasure tapeMeasure = new TapeMeasure(hardwareMap, gamepad1,gamepad2);
+        Thread tapeMeasureThread = new Thread(tapeMeasure);
 
         ElapsedTime timer = new ElapsedTime();
         Gamepad.RumbleEffect fastBlip;
@@ -97,211 +100,213 @@ public class MainTeleOp extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+        tapeMeasureThread.start();
         timer.reset();
         while (opModeIsActive()) {
 
-            if(rumble1 && timer.seconds() >= 75){
-                gamepad1.rumble(500);
-                rumble1 = false;
-            }else if(rumble2 && timer.seconds() >= 85){
-                gamepad1.runRumbleEffect(fastBlip);
-                rumble2 = false;
-            }else if(rumble3 && timer.seconds() >= 115){
-                gamepad1.runRumbleEffect(fastBlip);
-                rumble3 = false;
-            }
+            if(!tapeMeasure.isControlsActive()){
+                if(rumble1 && timer.seconds() >= 75){
+                    gamepad1.rumble(500);
+                    rumble1 = false;
+                }else if(rumble2 && timer.seconds() >= 85){
+                    gamepad1.runRumbleEffect(fastBlip);
+                    rumble2 = false;
+                }else if(rumble3 && timer.seconds() >= 115){
+                    gamepad1.runRumbleEffect(fastBlip);
+                    rumble3 = false;
+                }
 
-            if (gamepad1.dpad_down) {
-                slowDown = .5;
-            } else {
-                slowDown = 1;
-            }
+                if (gamepad1.dpad_down) {
+                    slowDown = .5;
+                } else {
+                    slowDown = 1;
+                }
 
-            straight = gamepad1.left_stick_y * slowDown;
-            strafe = (gamepad1.left_stick_x * slowDown);
-            rotation = gamepad1.right_stick_x * slowDown;
+                straight = gamepad1.left_stick_y * slowDown;
+                strafe = (gamepad1.left_stick_x * slowDown);
+                rotation = gamepad1.right_stick_x * slowDown;
 
-            bl.setPower(straight + strafe + rotation);
-            br.setPower(straight - strafe - rotation);
-            fl.setPower(straight - strafe + rotation);
-            fr.setPower(straight + strafe - rotation);
+                bl.setPower(straight + strafe + rotation);
+                br.setPower(straight - strafe - rotation);
+                fl.setPower(straight - strafe + rotation);
+                fr.setPower(straight + strafe - rotation);
 
-            if (gamepad2.x) {
-                //TODO: I think we should investigate this further in the future, but as for now,
-                // competition is next week.
+                if (gamepad1.right_bumper) {
+                    intake.setPower(1);
+                } else if (gamepad1.left_bumper) {
+                    intake.setPower(-1);
+                } else {
+                    intake.setPower(0);
+                }
+
+                if (arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0) && !(imu.getAngularOrientation().thirdAngle < (90 - 15))) {
+                    arm.setTargetPosition(bottomLimit - 450);
+                    armSupport.setTargetPosition(arm.getTargetPosition());
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armSupport.setMode(arm.getMode());
+                    arm.setPower(armPower);
+                    armSupport.setPower(arm.getPower());
+                } else if (gamepad1.left_trigger > 0 && limit.getState()) {
+                    armPower = .5;
+                    arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    arm.setPower(gamepad1.left_trigger * armPower);
+                    armSupport.setPower(arm.getPower());
+                    targetPos = arm.getCurrentPosition();
+                } else if (gamepad1.right_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400) {
+                    armPower = .5;
+                    arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    arm.setPower(-gamepad1.right_trigger * armPower);
+                    armSupport.setPower(arm.getPower());
+                    targetPos = arm.getCurrentPosition();
+                } else {
+                    arm.setTargetPosition(targetPos);
+                    armSupport.setTargetPosition(arm.getTargetPosition());
+                    arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    armSupport.setMode(arm.getMode());
+                    arm.setPower(.5);
+                    armSupport.setPower(arm.getPower());
+                }
+
+                if(gamepad1.a){
+                    if(toggle){
+                        armState = !armState;
+                        toggle = false;
+                    }
+                }else{
+                    toggle = true;
+                }
+
+                if(gamepad1.a && armState){
+                    targetPos = bottomLimit - levelHeight;
+                }else if(gamepad1.a && !armState) {
+                    targetPos = bottomLimit;
+                }
+
+                if(imu.getAngularOrientation().thirdAngle < (90 - 15)){
+                    targetPos = bottomLimit - 100;
+                    armState = true;
+                }
+
+                if((arm.getCurrentPosition() <= bottomLimit - 300) && gamepad1.y){
+                    gate.setPosition(gateOpen);
+
+                    if(gamepad1.b){
+                        bottom.setPosition(bottomOpen);
+                    }else {
+                        bottom.setPosition(bottomClosed);
+                    }
+                }else if(arm.getCurrentPosition() >= bottomLimit - 100 && (gamepad1.right_bumper || gamepad1.y)){
+                    gate.setPosition(gateOpen);
+
+                    if(gamepad1.b){
+                        bottom.setPosition(bottomOpen);
+                    }else {
+                        bottom.setPosition(bottomClosed);
+                    }
+                }else if(bottomLimit - 100 > arm.getCurrentPosition() && arm.getCurrentPosition() > bottomLimit - 300 && gamepad1.y){
+                    bottom.setPosition(bottomOpen);
+
+                    if(gamepad1.x){
+                        gate.setPosition(gateOpen);
+                    }else{
+                        gate.setPosition(quasiGateOpen);
+                    }
+                }else{
+                    if(gamepad1.b){
+                        bottom.setPosition(bottomOpen);
+                    }else {
+                        bottom.setPosition(bottomClosed);
+                    }
+
+                    if(gamepad1.x){
+                        gate.setPosition(gateOpen);
+                    }else{
+                        gate.setPosition(gateClosed);
+                    }
+                }
+
+                if (gamepad2.dpad_left) {
+                    //TODO: I think we should investigate this further in the future, but as for now,
+                    // competition is next week.
 //                int startPos = duckWheel.getCurrentPosition();
 //                duckWheel.setVelocity(180, AngleUnit.DEGREES);
 //                if(duckWheel.getCurrentPosition() + startPos > 400){
 //                    duckWheel.setVelocity(360, AngleUnit.DEGREES);
 //                }
-                duckWheel.setVelocity(180, AngleUnit.DEGREES);
-            } else if (gamepad2.b) {
-                duckWheel.setVelocity(-180, AngleUnit.DEGREES);
-            } else {
-                duckWheel.setPower(0);
-            }
-
-            if (gamepad1.right_bumper) {
-                intake.setPower(1);
-            } else if (gamepad1.left_bumper) {
-                intake.setPower(-1);
-            } else {
-                intake.setPower(0);
-            }
-
-            if (!limit.getState()) {
-                bottomLimit = arm.getCurrentPosition();
-            }
-
-            if (arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0) && !(imu.getAngularOrientation().thirdAngle < (90 - 15))) {
-                arm.setTargetPosition(bottomLimit - 450);
-                armSupport.setTargetPosition(arm.getTargetPosition());
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armSupport.setMode(arm.getMode());
-                arm.setPower(armPower);
-                armSupport.setPower(arm.getPower());
-            } else if (gamepad1.left_trigger > 0 && limit.getState()) {
-                armPower = .5;
-                arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                arm.setPower(gamepad1.left_trigger * armPower);
-                armSupport.setPower(arm.getPower());
-                targetPos = arm.getCurrentPosition();
-            } else if (gamepad1.right_trigger > 0 && arm.getCurrentPosition() > bottomLimit - 400) {
-                armPower = .5;
-                arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                armSupport.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                arm.setPower(-gamepad1.right_trigger * armPower);
-                armSupport.setPower(arm.getPower());
-                targetPos = arm.getCurrentPosition();
-            } else {
-                arm.setTargetPosition(targetPos);
-                armSupport.setTargetPosition(arm.getTargetPosition());
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                armSupport.setMode(arm.getMode());
-                arm.setPower(.5);
-                armSupport.setPower(arm.getPower());
-            }
-
-            if (gamepad2.dpad_up) {
-                if (toggle2) {
-                    level++;
-                    toggle2 = false;
+                    duckWheel.setVelocity(180, AngleUnit.DEGREES);
+                } else if (gamepad2.dpad_right) {
+                    duckWheel.setVelocity(-180, AngleUnit.DEGREES);
+                } else {
+                    duckWheel.setPower(0);
                 }
-            } else if (gamepad2.dpad_down) {
-                if (toggle2) {
-                    level--;
-                    toggle2 = false;
+
+                if (!limit.getState()) {
+                    bottomLimit = arm.getCurrentPosition();
                 }
-            } else {
-                toggle2 = true;
-            }
 
-            if (level > 3) {
-                level = 0;
-            } else if (level < 0) {
-                level = 3;
-            }
-
-            if(level == 0) {
-                levelHeight = SHARED;
-                currentTarget = "SHARED SHIPPING HUB";
-            }else if(level == 1){
-                levelHeight = BOTTOM;
-                currentTarget = "BOTTOM LEVEL";
-            }else if(level == 2){
-                levelHeight = MIDDLE;
-                currentTarget = "MIDDLE LEVEL";
-            }else if(level == 3){
-                levelHeight = HIGH;
-                currentTarget = "TOP LEVEL";
-            }
-
-            if(gamepad2.right_bumper){
-                if(toggle3){
-                    SHARED += 10;
-                    toggle3 = false;
+                if (gamepad2.dpad_up) {
+                    if (toggle2) {
+                        level++;
+                        toggle2 = false;
+                    }
+                } else if (gamepad2.dpad_down) {
+                    if (toggle2) {
+                        level--;
+                        toggle2 = false;
+                    }
+                } else {
+                    toggle2 = true;
                 }
-            }else if(gamepad2.left_bumper){
-                if(toggle3){
-                    SHARED -= 10;
-                    toggle3 = false;
+
+                if (level > 3) {
+                    level = 0;
+                } else if (level < 0) {
+                    level = 3;
                 }
-            }else if(gamepad2.right_trigger > 0){
-                if(toggle3){
-                    SHARED += 20;
-                    toggle3 = false;
+
+                if(level == 0) {
+                    levelHeight = SHARED;
+                    currentTarget = "SHARED SHIPPING HUB";
+                }else if(level == 1){
+                    levelHeight = BOTTOM;
+                    currentTarget = "BOTTOM LEVEL";
+                }else if(level == 2){
+                    levelHeight = MIDDLE;
+                    currentTarget = "MIDDLE LEVEL";
+                }else if(level == 3){
+                    levelHeight = HIGH;
+                    currentTarget = "TOP LEVEL";
                 }
-            }else if(gamepad2.left_trigger > 0){
-                if(toggle3){
-                    SHARED -= 20;
-                    toggle3 = false;
-                }
-            }else{
-                toggle3 = true;
-            }
 
-            if(gamepad1.a){
-                if(toggle){
-                   armState = !armState;
-                   toggle = false;
-                }
-            }else{
-                toggle = true;
-            }
-
-            if(gamepad1.a && armState){
-                targetPos = bottomLimit - levelHeight;
-            }else if(gamepad1.a && !armState) {
-                targetPos = bottomLimit;
-            }
-
-            if(imu.getAngularOrientation().thirdAngle < (90 - 15)){
-                targetPos = bottomLimit - 100;
-                armState = true;
-            }
-
-            if((arm.getCurrentPosition() <= bottomLimit - 300) && gamepad1.y){
-                gate.setPosition(gateOpen);
-
-                if(gamepad1.b){
-                    bottom.setPosition(bottomOpen);
-                }else {
-                    bottom.setPosition(bottomClosed);
-                }
-            }else if(arm.getCurrentPosition() >= bottomLimit - 100 && (gamepad1.right_bumper || gamepad1.y)){
-                gate.setPosition(gateOpen);
-
-                if(gamepad1.b){
-                    bottom.setPosition(bottomOpen);
-                }else {
-                    bottom.setPosition(bottomClosed);
-                }
-            }else if(bottomLimit - 100 > arm.getCurrentPosition() && arm.getCurrentPosition() > bottomLimit - 300 && gamepad1.y){
-                bottom.setPosition(bottomOpen);
-
-                if(gamepad1.x){
-                    gate.setPosition(gateOpen);
+                if(gamepad2.right_bumper){
+                    if(toggle3){
+                        SHARED += 10;
+                        toggle3 = false;
+                    }
+                }else if(gamepad2.left_bumper){
+                    if(toggle3){
+                        SHARED -= 10;
+                        toggle3 = false;
+                    }
+                }else if(gamepad2.right_trigger > 0){
+                    if(toggle3){
+                        SHARED += 20;
+                        toggle3 = false;
+                    }
+                }else if(gamepad2.left_trigger > 0){
+                    if(toggle3){
+                        SHARED -= 20;
+                        toggle3 = false;
+                    }
                 }else{
-                    gate.setPosition(quasiGateOpen);
+                    toggle3 = true;
                 }
-            }else{
-                if(gamepad1.b){
-                    bottom.setPosition(bottomOpen);
-                }else {
-                    bottom.setPosition(bottomClosed);
-                }
-
-                if(gamepad1.x){
-                    gate.setPosition(gateOpen);
-                }else{
-                    gate.setPosition(gateClosed);
-                }
-            }
 
 //            telemetry.addData("target pos", targetPos);
-            telemetry.addData("current pos", -(arm.getCurrentPosition() - bottomLimit));
-            telemetry.addData("arm pos", armSupport.getCurrentPosition());
+                telemetry.addData("current pos", -(arm.getCurrentPosition() - bottomLimit));
+                telemetry.addData("arm pos", armSupport.getCurrentPosition());
 //            telemetry.addData("left stick y", gamepad1.left_stick_y);
 //            telemetry.addData("motor power", intake.getPower());
 //            telemetry.addData("duck wheel", duckWheel.getPower());
@@ -309,14 +314,123 @@ public class MainTeleOp extends LinearOpMode {
 //            telemetry.addData("arm power", arm.getPower());
 //            telemetry.addData("armSupport power", arm.getPower());
 //            telemetry.addData("armState", armState);
-            telemetry.addData("SHARED HEIGHT", SHARED);
-            telemetry.addData("gate", gate.getPosition());
-            telemetry.addData("level", level);
-            telemetry.addData("toggle2", toggle2);
-            telemetry.addData("target level", currentTarget);
-            telemetry.addData("time", (int)timer.seconds());
-            telemetry.addData("gyro reading", imu.getAngularOrientation().thirdAngle);
-            telemetry.update();
+                telemetry.addData("SHARED HEIGHT", SHARED);
+                telemetry.addData("gate", gate.getPosition());
+                telemetry.addData("level", level);
+                telemetry.addData("toggle2", toggle2);
+                telemetry.addData("target level", currentTarget);
+                telemetry.addData("time", (int)timer.seconds());
+                telemetry.addData("gyro reading", imu.getAngularOrientation().thirdAngle);
+                telemetry.update();
+            }else{
+                straight = gamepad2.left_stick_y * .25;
+                strafe = (gamepad2.left_stick_x * .3);
+                rotation = gamepad2.right_stick_x * .3;
+
+                bl.setPower(straight + strafe + rotation);
+                br.setPower(straight - strafe - rotation);
+                fl.setPower(straight - strafe + rotation);
+                fr.setPower(straight + strafe - rotation);
+
+                if (gamepad2.dpad_left) {
+                    //TODO: I think we should investigate this further in the future, but as for now,
+                    // competition is next week.
+//                int startPos = duckWheel.getCurrentPosition();
+//                duckWheel.setVelocity(180, AngleUnit.DEGREES);
+//                if(duckWheel.getCurrentPosition() + startPos > 400){
+//                    duckWheel.setVelocity(360, AngleUnit.DEGREES);
+//                }
+                    duckWheel.setVelocity(180, AngleUnit.DEGREES);
+                } else if (gamepad2.dpad_right) {
+                    duckWheel.setVelocity(-180, AngleUnit.DEGREES);
+                } else {
+                    duckWheel.setPower(0);
+                }
+
+                if (!limit.getState()) {
+                    bottomLimit = arm.getCurrentPosition();
+                }
+
+                if (gamepad2.dpad_up) {
+                    if (toggle2) {
+                        level++;
+                        toggle2 = false;
+                    }
+                } else if (gamepad2.dpad_down) {
+                    if (toggle2) {
+                        level--;
+                        toggle2 = false;
+                    }
+                } else {
+                    toggle2 = true;
+                }
+
+                if (level > 3) {
+                    level = 0;
+                } else if (level < 0) {
+                    level = 3;
+                }
+
+                if(level == 0) {
+                    levelHeight = SHARED;
+                    currentTarget = "SHARED SHIPPING HUB";
+                }else if(level == 1){
+                    levelHeight = BOTTOM;
+                    currentTarget = "BOTTOM LEVEL";
+                }else if(level == 2){
+                    levelHeight = MIDDLE;
+                    currentTarget = "MIDDLE LEVEL";
+                }else if(level == 3){
+                    levelHeight = HIGH;
+                    currentTarget = "TOP LEVEL";
+                }
+
+                if(gamepad2.right_bumper){
+                    if(toggle3){
+                        SHARED += 10;
+                        toggle3 = false;
+                    }
+                }else if(gamepad2.left_bumper){
+                    if(toggle3){
+                        SHARED -= 10;
+                        toggle3 = false;
+                    }
+                }else if(gamepad2.right_trigger > 0){
+                    if(toggle3){
+                        SHARED += 20;
+                        toggle3 = false;
+                    }
+                }else if(gamepad2.left_trigger > 0){
+                    if(toggle3){
+                        SHARED -= 20;
+                        toggle3 = false;
+                    }
+                }else{
+                    toggle3 = true;
+                }
+
+//            telemetry.addData("target pos", targetPos);
+                telemetry.addData("current pos", -(arm.getCurrentPosition() - bottomLimit));
+                telemetry.addData("arm pos", armSupport.getCurrentPosition());
+//            telemetry.addData("left stick y", gamepad1.left_stick_y);
+//            telemetry.addData("motor power", intake.getPower());
+//            telemetry.addData("duck wheel", duckWheel.getPower());
+//            telemetry.addData("touch sensor", limit.getState());
+//            telemetry.addData("arm power", arm.getPower());
+//            telemetry.addData("armSupport power", arm.getPower());
+//            telemetry.addData("armState", armState);
+                telemetry.addData("SHARED HEIGHT", SHARED);
+                telemetry.addData("gate", gate.getPosition());
+                telemetry.addData("level", level);
+                telemetry.addData("toggle2", toggle2);
+                telemetry.addData("target level", currentTarget);
+                telemetry.addData("time", (int)timer.seconds());
+                telemetry.addData("gyro reading", imu.getAngularOrientation().thirdAngle);
+                telemetry.update();
+            }
+
+
         }
+        tapeMeasureThread.interrupt();
     }
 }

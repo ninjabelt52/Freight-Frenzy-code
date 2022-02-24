@@ -27,7 +27,7 @@ public class ColorSensorTest extends LinearOpMode {
             if(hsvValues[1] > .4){
                 intake.setPower(-1);
             }else{
-                intake.setPower(0);
+                intake.setPower(-1);
             }
 
             telemetry.addLine()

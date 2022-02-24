@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests;
-
-import android.text.Html;
+package org.firstinspires.ftc.teamcode.Autos.RED;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -11,27 +9,29 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.RoadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.classes.Arm;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineBlue;
+import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineRed;
 
-@Autonomous
-public class GUIAuto extends LinearOpMode {
+@Autonomous(name = "Red GUI auto", group = "Red")
+public class GUIAutoRed extends LinearOpMode {
     public void runOpMode(){
-        DuckDetectorPipelineBlue.DuckPos duckPos;
+        DuckDetectorPipelineRed.DuckPos duckPos;
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Arm arm = new Arm(hardwareMap);
-        DuckDetectorPipelineBlue detector = new DuckDetectorPipelineBlue(hardwareMap, "Webcam 1");
+        DuckDetectorPipelineRed detector = new DuckDetectorPipelineRed(hardwareMap, "Webcam 1");
         DcMotor intake = hardwareMap.get(DcMotor.class, "intake");
         DcMotorEx duckWheel = hardwareMap.get(DcMotorEx.class, "Rim");
 
 
-        boolean warehouseAuto = true, warehousePark = true;
+        boolean warehouseAuto = true, backPark = true;
         boolean toggle1 = false, toggle2 = false, toggle3 = false, toggle4 = false;
         int c = 0;
 
-        drive.setPoseEstimate(new Pose2d(6.25, 64.88, Math.toRadians(270)));
+        drive.setPoseEstimate(new Pose2d(6.25, -64.88, Math.toRadians(-270)));
 
         while(!gamepad1.right_stick_button && !isStarted()) {
             Pose2d estimate = drive.getPoseEstimate();
@@ -56,11 +56,11 @@ public class GUIAuto extends LinearOpMode {
                         warehouseAuto = !warehouseAuto;
 
                         if (warehouseAuto) {
-                            drive.setPoseEstimate(new Pose2d(6.25, 64.88, Math.toRadians(270)));
-                            warehousePark = true;
+                            drive.setPoseEstimate(new Pose2d(6.25, -64.88, Math.toRadians(-270)));
+                            backPark = true;
                         } else {
-                            drive.setPoseEstimate(new Pose2d(-41.38, 65.75, Math.toRadians(180)));
-                            warehousePark = false;
+                            drive.setPoseEstimate(new Pose2d(-41.38, -65.75, Math.toRadians(-270)));
+                            backPark = false;
                         }
 
                         toggle2 = false;
@@ -73,22 +73,22 @@ public class GUIAuto extends LinearOpMode {
             if (c == 1) {
                 if (gamepad1.y) {
                     if (toggle3) {
-                        drive.setPoseEstimate(new Pose2d(estimate.getX(), (estimate.getY() - 1)));
+                        drive.setPoseEstimate(new Pose2d(estimate.getX(), (estimate.getY() + 1)));
                         toggle3 = false;
                     }
                 } else if (gamepad1.a) {
                     if (toggle3) {
-                        drive.setPoseEstimate(new Pose2d(estimate.getX(), (estimate.getY() + 1)));
+                        drive.setPoseEstimate(new Pose2d(estimate.getX(), (estimate.getY() - 1)));
                         toggle3 = false;
                     }
                 } else if (gamepad1.b) {
                     if (toggle3) {
-                        drive.setPoseEstimate(new Pose2d((estimate.getX() - 1), estimate.getY()));
+                        drive.setPoseEstimate(new Pose2d((estimate.getX() + 1), estimate.getY()));
                         toggle3 = false;
                     }
                 } else if (gamepad1.x) {
                     if (toggle3) {
-                        drive.setPoseEstimate(new Pose2d((estimate.getX() + 1), estimate.getY()));
+                        drive.setPoseEstimate(new Pose2d((estimate.getX() - 1), estimate.getY()));
                         toggle3 = false;
                     }
                 } else {
@@ -96,10 +96,10 @@ public class GUIAuto extends LinearOpMode {
                 }
             }
 
-            if (c == 2 && !warehouseAuto) {
+            if (c == 2) {
                 if (gamepad1.b) {
                     if (toggle4) {
-                        warehousePark = !warehousePark;
+                        backPark = !backPark;
                         toggle4 = false;
                     }
                 } else {
@@ -107,41 +107,25 @@ public class GUIAuto extends LinearOpMode {
                 }
             }
 
-            if (warehouseAuto) {
-                if (c > 1) {
-                    c = 0;
-                } else if (c < 0) {
-                    c = 1;
-                }
-            } else {
-                if (c > 2) {
-                    c = 0;
-                } else if (c < 0) {
-                    c = 2;
-                }
-            }
-
             telemetry.addLine(((c == 0) ? "--->" : "") + "Robot will commence " + (warehouseAuto ? "warehouse auto" : "duck auto"));
             telemetry.addData(((c == 1) ? "--->" : "") + "Robot starting position", "X: " + drive.getPoseEstimate().getX() + "\nY: " + drive.getPoseEstimate().getY());
-            if (!warehouseAuto) {
-                telemetry.addLine(((c == 2) ? "--->" : "") + "Robot will park in " + (warehousePark ? "the warehouse" : "the storage unit"));
-            }
+            telemetry.addLine(((c == 2) ? "--->" : "") + "Robot will park in " + (backPark ? "the back of the warehouse" : "the front of the warehouse"));
             telemetry.update();
         }
 
             Trajectory bottomW = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(1.75, 44.93, Math.toRadians(56.35)))
-                    .addTemporalMarker(1.5, () -> {
+                    .lineToLinearHeading(new Pose2d(1.75, -44.93, Math.toRadians(-56.35)))
+                    .addTemporalMarker(1, () -> {
                         arm.moveArm(-175,1);
                     })
                     .build();
 
             Trajectory middleW = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(1.62, 45.66, Math.toRadians(56.35)))
+                    .lineToLinearHeading(new Pose2d(1.62, -45.66, Math.toRadians(-56.35)))
                     .addTemporalMarker(.5, () ->{
                         arm.open(.25, 1);
                     })
-                    .addTemporalMarker(1.5, () -> {
+                    .addTemporalMarker(1, () -> {
                         arm.moveArm(-250,1);
                     })
                     .addTemporalMarker(2, () ->{
@@ -150,8 +134,8 @@ public class GUIAuto extends LinearOpMode {
                     .build();
 
             Trajectory topW = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-1.89, 39.34, Math.toRadians(52.32)))
-                    .addTemporalMarker(1.5, () -> {
+                    .lineToLinearHeading(new Pose2d(-1.89, -39.34, Math.toRadians(-52.32)))
+                    .addTemporalMarker(1, () -> {
                         arm.moveArm(-350,1);
                     })
                     .build();
@@ -160,7 +144,7 @@ public class GUIAuto extends LinearOpMode {
             telemetry.addLine("FINAL RESULTS:");
             telemetry.addLine("Robot will commence " + (warehouseAuto ? "warehouse auto" : "duck auto"));
             telemetry.addData("Robot starting position", "X: " + drive.getPoseEstimate().getX() + "\nY: " + drive.getPoseEstimate().getY());
-            telemetry.addLine("Robot will park in " + (warehousePark ? "the warehouse" : "the storage unit"));
+            telemetry.addLine("Robot will park in " + (backPark ? "the warehouse" : "the storage unit"));
             telemetry.addLine("VISION TELEMETRY:");
             telemetry.addLine("" + detector);
             telemetry.addData("guess", detector.getPosition());
@@ -172,13 +156,13 @@ public class GUIAuto extends LinearOpMode {
         waitForStart();
 
         if(warehouseAuto){
-            if(duckPos.equals(DuckDetectorPipelineBlue.DuckPos.LEFT)) {
-                drive.followTrajectory(bottomW);
+            if(duckPos.equals(DuckDetectorPipelineRed.DuckPos.LEFT)) {
+                drive.followTrajectory(topW);
                 arm.open();
                 sleep(250);
                 arm.close();
                 sleep(250);
-            }else if(duckPos.equals(DuckDetectorPipelineBlue.DuckPos.CENTER)){
+            }else if(duckPos.equals(DuckDetectorPipelineRed.DuckPos.CENTER)){
                 drive.followTrajectory(middleW);
                 sleep(250);
                 arm.open(.1,0);
@@ -186,7 +170,7 @@ public class GUIAuto extends LinearOpMode {
                 arm.close();
                 sleep(250);
             }else{
-                drive.followTrajectory(topW);
+                drive.followTrajectory(bottomW);
                 arm.open();
                 sleep(250);
                 arm.close();
@@ -194,8 +178,10 @@ public class GUIAuto extends LinearOpMode {
             }
 
             Trajectory collect1 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
-                    .splineTo(new Vector2d(24, 65), 0)
-                    .lineToLinearHeading(new Pose2d(49, 65, 0))
+                    .splineTo(new Vector2d(24, -65), 0,
+                            SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                    .lineToLinearHeading(new Pose2d(49, -65, 0))
                     .addTemporalMarker(1.5, () -> {
                         intake.setPower(-1);
                         arm.moveArm(0, 1);
@@ -205,19 +191,24 @@ public class GUIAuto extends LinearOpMode {
 
             drive.followTrajectory(collect1);
 
-            Trajectory deliver1 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(24,65),Math.toRadians(180))
-                    .splineTo(new Vector2d(-.89, 41.34), Math.toRadians(232.32))
+            Trajectory backup1 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                    .lineToLinearHeading(new Pose2d(24,-65, 0))
                     .addTemporalMarker(0, () ->{
                         arm.close();
                     })
                     .addTemporalMarker(.25, () ->{
                         intake.setPower(1);
                     })
-                    .addTemporalMarker(1, () ->{
+                    .build();
+
+            drive.followTrajectory(backup1);
+
+            Trajectory deliver1 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
+                    .splineTo(new Vector2d(-5.89, -41.34), Math.toRadians(-237.32))
+                    .addTemporalMarker(.5, () ->{
                         arm.moveArm(-350, 1);
                     })
-                    .addTemporalMarker(2, () -> {
+                    .addTemporalMarker(1.5, () -> {
                         intake.setPower(0);
                     })
                     .build();
@@ -229,8 +220,8 @@ public class GUIAuto extends LinearOpMode {
             arm.close();
 
             Trajectory collect2 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
-                    .splineTo(new Vector2d(24, 65), 0)
-                    .splineToConstantHeading(new Vector2d(52,65), 0)
+                    .splineTo(new Vector2d(24, -65), 0)
+                    .splineToConstantHeading(new Vector2d(52,-65), 0)
                     .addTemporalMarker(1.5, () -> {
                         arm.moveArm(0, .5);
                         intake.setPower(-1);
@@ -241,7 +232,7 @@ public class GUIAuto extends LinearOpMode {
             drive.followTrajectory(collect2);
 
             Trajectory backup2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(24,65),Math.toRadians(180))
+                    .splineTo(new Vector2d(24,-65),Math.toRadians(-180))
                     .addTemporalMarker(0, () ->{
                         arm.close();
                     })
@@ -253,18 +244,11 @@ public class GUIAuto extends LinearOpMode {
             drive.followTrajectory(backup2);
 
             Trajectory deliver2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(24,65),Math.toRadians(180))
-                    .splineTo(new Vector2d(-.89, 41.34), Math.toRadians(232.32))
-                    .addTemporalMarker(0, () ->{
-                        arm.close();
-                    })
-                    .addTemporalMarker(.25, () -> {
-                        intake.setPower(1);
-                    })
-                    .addTemporalMarker(1, () ->{
+                    .splineTo(new Vector2d(-5.89, -41.34), Math.toRadians(-237.32))
+                    .addTemporalMarker(.5, () ->{
                         arm.moveArm(-350, 1);
                     })
-                    .addTemporalMarker(2, () -> {
+                    .addTemporalMarker(1.5, () -> {
                         intake.setPower(0);
                     })
                     .build();
@@ -276,8 +260,8 @@ public class GUIAuto extends LinearOpMode {
             arm.close();
 
             Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .splineTo(new Vector2d(24, 65), 0)
-                    .splineTo(new Vector2d(43.38, 65), 0)
+                    .splineTo(new Vector2d(24, -65), 0)
+                    .lineToLinearHeading(new Pose2d(43.38, -65, 0))
                     .addTemporalMarker(2, () -> {
                         arm.moveArm(0, .5);
                         intake.setPower(-1);
@@ -286,31 +270,40 @@ public class GUIAuto extends LinearOpMode {
                     .build();
 
             drive.followTrajectory(park);
+
+            if(backPark){
+                Trajectory parkBack = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(new Vector2d(43.38, -41), Math.toRadians(-270))
+                        .splineTo(new Vector2d(63.38,-41),0)
+                        .build();
+
+                drive.followTrajectory(parkBack);
+            }
         }else{
             Trajectory wheel = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-62.38,57.25, Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(-64.38,-57.25, Math.toRadians(270)))
                     .build();
 
             drive.followTrajectory(wheel);
 
             Trajectory strafe = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-62.38, 63, Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(-62.38, -60.25, Math.toRadians(270)))
                     .build();
 
             drive.followTrajectory(strafe);
 
-            duckWheel.setVelocity(180, AngleUnit.DEGREES);
+            duckWheel.setVelocity(-180, AngleUnit.DEGREES);
             sleep(3000);
             duckWheel.setVelocity(0, AngleUnit.DEGREES);
 
             Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-64.38, 12, Math.toRadians(180)))
+                    .lineToLinearHeading(new Pose2d(-64.38, -12, Math.toRadians(-180)))
                     .build();
 
             drive.followTrajectory(park);
 
             Trajectory bottom = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-12,-10, Math.toRadians(270)), 0)
+                    .splineToLinearHeading(new Pose2d(-7,4, Math.toRadians(-270)), 0)
                     .addTemporalMarker(1, () -> {
                         arm.moveArm(-150, 1);
                     })
@@ -321,34 +314,34 @@ public class GUIAuto extends LinearOpMode {
 //                .build();
 
             Trajectory middle = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-12,-9.38, Math.toRadians(270)), 0)
+                    .splineToLinearHeading(new Pose2d(-7,5.38, Math.toRadians(-270)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.open(.25, 1);
                     })
                     .addTemporalMarker(1, () -> {
                         arm.moveArm(-250, 1);
                     })
-                    .addTemporalMarker(2, () ->{
+                    .addTemporalMarker(2.5, () ->{
                         arm.open();
                     })
                     .build();
 
             Trajectory top = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-12,-3.38, Math.toRadians(270)), 0)
+                    .splineToLinearHeading(new Pose2d(-7,-1.38, Math.toRadians(-270)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.moveArm(-350, 1);
                     })
                     .build();
 
 
-            if(duckPos.equals(DuckDetectorPipelineBlue.DuckPos.LEFT)) {
-                drive.followTrajectory(bottom);
+            if(duckPos.equals(DuckDetectorPipelineRed.DuckPos.LEFT)) {
+                drive.followTrajectory(top);
 //            drive.followTrajectory(followUp);
                 arm.open();
                 sleep(500);
                 arm.close();
                 sleep(250);
-            }else if(duckPos.equals(DuckDetectorPipelineBlue.DuckPos.CENTER)){
+            }else if(duckPos.equals(DuckDetectorPipelineRed.DuckPos.CENTER)){
                 drive.followTrajectory(middle);
                 sleep(500);
                 arm.open(.1,0);
@@ -356,7 +349,7 @@ public class GUIAuto extends LinearOpMode {
                 arm.close();
                 sleep(250);
             }else{
-                drive.followTrajectory(top);
+                drive.followTrajectory(bottom);
                 arm.open();
                 sleep(500);
                 arm.close();
@@ -364,22 +357,20 @@ public class GUIAuto extends LinearOpMode {
             }
 
             Trajectory backup = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-12,-15, Math.toRadians(270)))
+                    .lineToLinearHeading(new Pose2d(-12,10, Math.toRadians(-270)))
                     .build();
 
             drive.followTrajectory(backup);
 
-            if(!warehousePark){
-                Trajectory end = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .lineToLinearHeading(new Pose2d(-64.38, 31, Math.toRadians(0)))
-                        .addTemporalMarker(2, () -> {
-                            arm.moveArm(0, .5);
-                            arm.close();
-                        })
-                        .build();
+            Trajectory end = drive.trajectoryBuilder(drive.getPoseEstimate())
+                    .lineToLinearHeading(new Pose2d(-64.38, -36, Math.toRadians(0)))
+                    .addTemporalMarker(2, () -> {
+                        arm.moveArm(0, .5);
+                        arm.close();
+                    })
+                    .build();
 
-                drive.followTrajectory(end);
-            }
+            drive.followTrajectory(end);
         }
     }
 }

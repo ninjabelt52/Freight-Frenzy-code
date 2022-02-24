@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 @TeleOp
 public class MeasuringTapeTest extends LinearOpMode {
     public void runOpMode(){
-        TapeMeasure tape = new TapeMeasure(hardwareMap, gamepad1);
+        TapeMeasure tape = new TapeMeasure(hardwareMap, gamepad1, gamepad2);
         boolean toggle = false;
 
         Thread tapeThread = new Thread(tape);
