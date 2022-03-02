@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.classes;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,15 +13,16 @@ public class TapeMeasure implements Runnable{
     private Servo liftL, liftR, zAxis, xAxis;
     private CRServo  feed;
     public static double zInit = 0, xInit = 1;
-    public static double xOpen = .48, targetZ, liftPos = .45, liftLPos, liftRPos;
+    public static double xOpen = .35, targetZ, zOpen, liftPos = .45, liftLPos, liftRPos, aPosZB, aPosXB, aPosZR, aPosXR;
     public static double leftBound = 0, rightBound = 1, bottomBound = 0, topBound = .5, targetXAxis;
     private double lastAngle = 0, globalAngle = 0, baseAngle = 0, slowSpeed;
     private boolean toggle = false, contFeed = false, toggle2 = false;
     private boolean isOpen = false, controlsActive = false;
+    private Side side;
     Gamepad gamepad1, gamepad2;
     String telemetry;
 
-    public TapeMeasure(HardwareMap hardwareMap, Gamepad gamepadOne, Gamepad gamepadTwo){
+    public TapeMeasure(HardwareMap hardwareMap, Gamepad gamepadOne, Gamepad gamepadTwo, Side side){
         liftL = hardwareMap.get(Servo.class, "liftL");
         liftR = hardwareMap.get(Servo.class, "liftR");
         zAxis = hardwareMap.get(Servo.class, "zAxis");
@@ -41,6 +41,14 @@ public class TapeMeasure implements Runnable{
         zAxis.setPosition(zInit);
         xAxis.setPosition(xInit);
 
+        this.side = side;
+
+        if(side.equals(Side.BLUE)){
+            zOpen = .7;
+        }else if (side.equals(Side.RED)){
+            zOpen = .96;
+        }
+
         telemetry = "gyro is calibrated";
     }
 
@@ -58,7 +66,7 @@ public class TapeMeasure implements Runnable{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        zAxis.setPosition(.7);
+        zAxis.setPosition(zOpen);
         feed.setPower(-1);
         targetXAxis = xAxis.getPosition();
         targetZ = zAxis.getPosition();
@@ -111,8 +119,23 @@ public class TapeMeasure implements Runnable{
         return telemetry;
     }
 
+    public enum Side{
+        RED,
+        BLUE
+    }
+
     public void run(){
         while(!Thread.interrupted()) {
+            if(gamepad1.b){
+                if (side.equals(Side.BLUE)) {
+                    targetZ = aPosZB;
+                    targetXAxis = aPosXB;
+                } else if (side.equals(Side.RED)) {
+                    targetZ = aPosZR;
+                    targetXAxis = aPosXR;
+                }
+            }
+
             if(gamepad1.start){
                 if(toggle2){
                     controlsActive = !controlsActive;
@@ -135,12 +158,12 @@ public class TapeMeasure implements Runnable{
                 extend(-1);
             }
 
-            if(gamepad2.dpad_down){
+            if(gamepad2.left_stick_button){
                 extend(1);
             }
 
             if (controlsActive) {
-                if(!gamepad2.dpad_down) {
+                if(!gamepad2.left_stick_button) {
                     if (isOpen()) {
                         if (Math.abs(gamepad1.left_stick_y) > 0) {
                             extend(gamepad1.left_stick_y *slowSpeed);

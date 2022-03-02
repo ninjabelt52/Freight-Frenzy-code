@@ -22,8 +22,8 @@ public class DuckDetectorPipelineBlue {
     Threshold thresh;
     String telemetry = "waiting for input";
     DuckPos position;
-    public static Rect right = new Rect(185,100,25,25);
-    public static Rect middle = new Rect(50,110,25,25);
+    public static Rect right = new Rect(185,115,25,25);
+    public static Rect middle = new Rect(50,125,25,25);
     public static int threshVal = 128;
     public static int filterVal = 10;
 

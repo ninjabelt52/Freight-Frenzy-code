@@ -134,7 +134,7 @@ public class GUIAutoBlue extends LinearOpMode {
                     .build();
 
             Trajectory topW = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-1.89, 39.34, Math.toRadians(52.32)))
+                    .lineToLinearHeading(new Pose2d(-7, 44.34, Math.toRadians(70)))
                     .addTemporalMarker(1, () -> {
                         arm.moveArm(-350,1);
                     })
@@ -144,7 +144,7 @@ public class GUIAutoBlue extends LinearOpMode {
             telemetry.addLine("FINAL RESULTS:");
             telemetry.addLine("Robot will commence " + (warehouseAuto ? "warehouse auto" : "duck auto"));
             telemetry.addData("Robot starting position", "X: " + drive.getPoseEstimate().getX() + "\nY: " + drive.getPoseEstimate().getY());
-            telemetry.addLine("Robot will park in " + (backPark ? "the warehouse" : "the storage unit"));
+            telemetry.addLine("Robot will park in " + (backPark ? "the back of the warehouse" : "the front of the warehouse"));
             telemetry.addLine("VISION TELEMETRY:");
             telemetry.addLine("" + detector);
             telemetry.addData("guess", detector.getPosition());
@@ -202,7 +202,7 @@ public class GUIAutoBlue extends LinearOpMode {
             drive.followTrajectory(backup1);
 
             Trajectory deliver1 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(-1.89, 41.34), Math.toRadians(232.32))
+                    .splineTo(new Vector2d(-7, 44.34), Math.toRadians(250))
                     .addTemporalMarker(.5, () ->{
                         arm.moveArm(-350, 1);
                     })
@@ -242,7 +242,7 @@ public class GUIAutoBlue extends LinearOpMode {
             drive.followTrajectory(backup2);
 
             Trajectory deliver2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(-1.89, 41.34), Math.toRadians(232.32))
+                    .splineTo(new Vector2d(-7, 44.34), Math.toRadians(250))
                     .addTemporalMarker(.5, () ->{
                         arm.moveArm(-350, 1);
                     })
@@ -257,25 +257,37 @@ public class GUIAutoBlue extends LinearOpMode {
             sleep(250);
             arm.close();
 
-            Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .splineTo(new Vector2d(24, 65), 0)
-                    .lineToLinearHeading(new Pose2d(43.38, 65, 0))
-                    .addTemporalMarker(2, () -> {
-                        arm.moveArm(0, .5);
-                        intake.setPower(-1);
-                        arm.open();
-                    })
-                    .build();
-
-            drive.followTrajectory(park);
-
             if(backPark){
+                Trajectory park2 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(new Vector2d(24, 65), 0)
+                        .lineToLinearHeading(new Pose2d(33.38, 65, 0))
+                        .addTemporalMarker(2, () -> {
+                            arm.moveArm(0, .5);
+                            intake.setPower(-1);
+                            arm.open();
+                        })
+                        .build();
+
+                drive.followTrajectory(park2);
+
                 Trajectory parkBack = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(new Vector2d(43.38, 41), Math.toRadians(270))
-                        .splineTo(new Vector2d(63.38,41),0)
+                        .splineTo(new Vector2d(33.38, 51), Math.toRadians(270))
+                        .splineTo(new Vector2d(58.38,51),0)
                         .build();
 
                 drive.followTrajectory(parkBack);
+            }else{
+                Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(new Vector2d(24, 65), 0)
+                        .lineToLinearHeading(new Pose2d(43.38, 65, 0))
+                        .addTemporalMarker(2, () -> {
+                            arm.moveArm(0, .5);
+                            intake.setPower(-1);
+                            arm.open();
+                        })
+                        .build();
+
+                drive.followTrajectory(park);
             }
         }else{
             Trajectory wheel = drive.trajectoryBuilder(drive.getPoseEstimate())
@@ -301,7 +313,7 @@ public class GUIAutoBlue extends LinearOpMode {
             drive.followTrajectory(park);
 
             Trajectory bottom = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-12,-10, Math.toRadians(270)), 0)
+                    .splineToLinearHeading(new Pose2d(-36,15, Math.toRadians(155)), 0)
                     .addTemporalMarker(1, () -> {
                         arm.moveArm(-150, 1);
                     })
@@ -312,7 +324,7 @@ public class GUIAutoBlue extends LinearOpMode {
 //                .build();
 
             Trajectory middle = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-12,-9.38, Math.toRadians(270)), 0)
+                    .splineToLinearHeading(new Pose2d(-36,15, Math.toRadians(155)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.open(.25, 1);
                     })
@@ -325,7 +337,7 @@ public class GUIAutoBlue extends LinearOpMode {
                     .build();
 
             Trajectory top = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-12,-3.38, Math.toRadians(270)), 0)
+                    .splineToLinearHeading(new Pose2d(-36,15, Math.toRadians(155)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.moveArm(-350, 1);
                     })
