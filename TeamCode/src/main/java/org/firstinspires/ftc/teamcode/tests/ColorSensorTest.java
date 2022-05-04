@@ -2,12 +2,14 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import android.graphics.Color;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 
 @TeleOp
+@Disabled
 public class ColorSensorTest extends LinearOpMode {
     public void runOpMode() {
         NormalizedColorSensor color = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");

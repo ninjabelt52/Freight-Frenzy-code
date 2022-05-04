@@ -19,7 +19,8 @@ import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 @TeleOp(name = "RED Freight Frenzy TeleOp", group = "RED")
 public class RedTeleOp extends LinearOpMode {
     public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2, straight, strafe, rotation;
-    public static int BOTTOM = 175, MIDDLE = 250, HIGH = 350,  targetPos = 0;
+    public static int BOTTOM = 175, MIDDLE = 250, HIGH = 350;
+    public int targetPos = 0;
     public int SHARED = 175;
 
     public void runOpMode() {
@@ -120,7 +121,7 @@ public class RedTeleOp extends LinearOpMode {
 
                 straight = gamepad1.left_stick_y * slowDown;
                 strafe = (gamepad1.left_stick_x * slowDown);
-                rotation = gamepad1.right_stick_x * slowDown;
+                rotation = gamepad1.right_stick_x * slowDown * .5;
 
                 bl.setPower(straight + strafe + rotation);
                 br.setPower(straight - strafe - rotation);
@@ -223,7 +224,7 @@ public class RedTeleOp extends LinearOpMode {
                     }
                 }
 
-                if (gamepad2.dpad_left) {
+                if (gamepad2.x) {
                     //TODO: I think we should investigate this further in the future, but as for now,
                     // competition is next week.
 //                int startPos = duckWheel.getCurrentPosition();
@@ -232,7 +233,7 @@ public class RedTeleOp extends LinearOpMode {
 //                    duckWheel.setVelocity(360, AngleUnit.DEGREES);
 //                }
                     duckWheel.setVelocity(180, AngleUnit.DEGREES);
-                } else if (gamepad2.dpad_right) {
+                } else if (gamepad2.b) {
                     duckWheel.setVelocity(-180, AngleUnit.DEGREES);
                 } else {
                     duckWheel.setPower(0);
@@ -328,7 +329,7 @@ public class RedTeleOp extends LinearOpMode {
                 fl.setPower(straight - strafe + rotation);
                 fr.setPower(straight + strafe - rotation);
 
-                if (gamepad2.dpad_left) {
+                if (gamepad2.x) {
                     //TODO: I think we should investigate this further in the future, but as for now,
                     // competition is next week.
 //                int startPos = duckWheel.getCurrentPosition();
@@ -337,7 +338,7 @@ public class RedTeleOp extends LinearOpMode {
 //                    duckWheel.setVelocity(360, AngleUnit.DEGREES);
 //                }
                     duckWheel.setVelocity(180, AngleUnit.DEGREES);
-                } else if (gamepad2.dpad_right) {
+                } else if (gamepad2.b) {
                     duckWheel.setVelocity(-180, AngleUnit.DEGREES);
                 } else {
                     duckWheel.setPower(0);

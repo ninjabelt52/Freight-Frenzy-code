@@ -271,8 +271,7 @@ public class GUIAutoBlue extends LinearOpMode {
                 drive.followTrajectory(park2);
 
                 Trajectory parkBack = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(new Vector2d(33.38, 51), Math.toRadians(270))
-                        .splineTo(new Vector2d(58.38,51),0)
+                        .lineToLinearHeading(new Pose2d(33.38, 36, Math.toRadians(0)))
                         .build();
 
                 drive.followTrajectory(parkBack);
@@ -313,9 +312,9 @@ public class GUIAutoBlue extends LinearOpMode {
             drive.followTrajectory(park);
 
             Trajectory bottom = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-36,15, Math.toRadians(155)), 0)
+                    .splineToLinearHeading(new Pose2d(-39,15, Math.toRadians(195)), 0)
                     .addTemporalMarker(1, () -> {
-                        arm.moveArm(-150, 1);
+                        arm.moveArm(-180, 1);
                     })
                     .build();
 
@@ -324,7 +323,7 @@ public class GUIAutoBlue extends LinearOpMode {
 //                .build();
 
             Trajectory middle = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-36,15, Math.toRadians(155)), 0)
+                    .splineToLinearHeading(new Pose2d(-39,15, Math.toRadians(195)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.open(.25, 1);
                     })
@@ -337,7 +336,7 @@ public class GUIAutoBlue extends LinearOpMode {
                     .build();
 
             Trajectory top = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-36,15, Math.toRadians(155)), 0)
+                    .splineToLinearHeading(new Pose2d(-36,15, Math.toRadians(195)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.moveArm(-350, 1);
                     })
@@ -366,21 +365,21 @@ public class GUIAutoBlue extends LinearOpMode {
                 sleep(250);
             }
 
-            Trajectory backup = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-12,-15, Math.toRadians(270)))
-                    .build();
-
-            drive.followTrajectory(backup);
-
             Trajectory end = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-64.38, 31, Math.toRadians(0)))
-                    .addTemporalMarker(2, () -> {
+                    .lineToLinearHeading(new Pose2d(-64.38, 12, Math.toRadians(0)))
+                    .addTemporalMarker(.5, () -> {
                         arm.moveArm(0, .5);
                         arm.close();
                     })
                     .build();
 
             drive.followTrajectory(end);
+
+            Trajectory line = drive.trajectoryBuilder(drive.getPoseEstimate())
+                    .lineToLinearHeading(new Pose2d(-64.38, 37, 0))
+                    .build();
+
+            drive.followTrajectory(line);
         }
     }
 }

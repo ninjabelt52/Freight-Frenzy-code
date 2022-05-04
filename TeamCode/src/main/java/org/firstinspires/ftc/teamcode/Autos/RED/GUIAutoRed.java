@@ -134,7 +134,7 @@ public class GUIAutoRed extends LinearOpMode {
                     .build();
 
             Trajectory topW = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-1.89, -39.34, Math.toRadians(-52.32)))
+                    .lineToLinearHeading(new Pose2d(-7, -44.34, Math.toRadians(-70)))
                     .addTemporalMarker(1, () -> {
                         arm.moveArm(-350,1);
                     })
@@ -157,7 +157,7 @@ public class GUIAutoRed extends LinearOpMode {
 
         if(warehouseAuto){
             if(duckPos.equals(DuckDetectorPipelineRed.DuckPos.LEFT)) {
-                drive.followTrajectory(topW);
+                drive.followTrajectory(bottomW);
                 arm.open();
                 sleep(250);
                 arm.close();
@@ -170,7 +170,7 @@ public class GUIAutoRed extends LinearOpMode {
                 arm.close();
                 sleep(250);
             }else{
-                drive.followTrajectory(bottomW);
+                drive.followTrajectory(topW);
                 arm.open();
                 sleep(250);
                 arm.close();
@@ -204,7 +204,7 @@ public class GUIAutoRed extends LinearOpMode {
             drive.followTrajectory(backup1);
 
             Trajectory deliver1 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(-5.89, -41.34), Math.toRadians(-237.32))
+                    .splineTo(new Vector2d(-7, -44.34), Math.toRadians(-250))
                     .addTemporalMarker(.5, () ->{
                         arm.moveArm(-350, 1);
                     })
@@ -244,7 +244,7 @@ public class GUIAutoRed extends LinearOpMode {
             drive.followTrajectory(backup2);
 
             Trajectory deliver2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(-5.89, -41.34), Math.toRadians(-237.32))
+                    .splineTo(new Vector2d(-7, -44.34), Math.toRadians(-250))
                     .addTemporalMarker(.5, () ->{
                         arm.moveArm(-350, 1);
                     })
@@ -259,25 +259,36 @@ public class GUIAutoRed extends LinearOpMode {
             sleep(250);
             arm.close();
 
-            Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .splineTo(new Vector2d(24, -65), 0)
-                    .lineToLinearHeading(new Pose2d(43.38, -65, 0))
-                    .addTemporalMarker(2, () -> {
-                        arm.moveArm(0, .5);
-                        intake.setPower(-1);
-                        arm.open();
-                    })
-                    .build();
-
-            drive.followTrajectory(park);
-
             if(backPark){
+                Trajectory park2 = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(new Vector2d(24, -65), 0)
+                        .lineToLinearHeading(new Pose2d(40.38, -65, 0))
+                        .addTemporalMarker(2, () -> {
+                            arm.moveArm(0, .5);
+                            intake.setPower(-1);
+                            arm.open();
+                        })
+                        .build();
+
+                drive.followTrajectory(park2);
+
                 Trajectory parkBack = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(new Vector2d(43.38, -41), Math.toRadians(-270))
-                        .splineTo(new Vector2d(63.38,-41),0)
+                        .lineToLinearHeading(new Pose2d(40.38, -36, Math.toRadians(0)))
                         .build();
 
                 drive.followTrajectory(parkBack);
+            }else{
+                Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
+                        .splineTo(new Vector2d(24, -65), 0)
+                        .lineToLinearHeading(new Pose2d(43.38, -65, 0))
+                        .addTemporalMarker(2, () -> {
+                            arm.moveArm(0, .5);
+                            intake.setPower(-1);
+                            arm.open();
+                        })
+                        .build();
+
+                drive.followTrajectory(park);
             }
         }else{
             Trajectory wheel = drive.trajectoryBuilder(drive.getPoseEstimate())
@@ -303,7 +314,7 @@ public class GUIAutoRed extends LinearOpMode {
             drive.followTrajectory(park);
 
             Trajectory bottom = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-7,4, Math.toRadians(-270)), 0)
+                    .splineToLinearHeading(new Pose2d(-38,-15, Math.toRadians(-195)), 0)
                     .addTemporalMarker(1, () -> {
                         arm.moveArm(-150, 1);
                     })
@@ -314,7 +325,7 @@ public class GUIAutoRed extends LinearOpMode {
 //                .build();
 
             Trajectory middle = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-7,5.38, Math.toRadians(-270)), 0)
+                    .splineToLinearHeading(new Pose2d(-39,-15, Math.toRadians(-195)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.open(.25, 1);
                     })
@@ -327,7 +338,7 @@ public class GUIAutoRed extends LinearOpMode {
                     .build();
 
             Trajectory top = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineToLinearHeading(new Pose2d(-7,-1.38, Math.toRadians(-270)), 0)
+                    .splineToLinearHeading(new Pose2d(-36,-15, Math.toRadians(-195)), 0)
                     .addTemporalMarker(.5, () -> {
                         arm.moveArm(-350, 1);
                     })
@@ -335,7 +346,7 @@ public class GUIAutoRed extends LinearOpMode {
 
 
             if(duckPos.equals(DuckDetectorPipelineRed.DuckPos.LEFT)) {
-                drive.followTrajectory(top);
+                drive.followTrajectory(bottom);
 //            drive.followTrajectory(followUp);
                 arm.open();
                 sleep(500);
@@ -349,28 +360,28 @@ public class GUIAutoRed extends LinearOpMode {
                 arm.close();
                 sleep(250);
             }else{
-                drive.followTrajectory(bottom);
+                drive.followTrajectory(top);
                 arm.open();
                 sleep(500);
                 arm.close();
                 sleep(250);
             }
 
-            Trajectory backup = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-12,10, Math.toRadians(-270)))
-                    .build();
-
-            drive.followTrajectory(backup);
-
             Trajectory end = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-64.38, -36, Math.toRadians(0)))
-                    .addTemporalMarker(2, () -> {
+                    .lineToLinearHeading(new Pose2d(-64.38, -12, Math.toRadians(0)))
+                    .addTemporalMarker(.5, () -> {
                         arm.moveArm(0, .5);
                         arm.close();
                     })
                     .build();
 
             drive.followTrajectory(end);
+
+            Trajectory line = drive.trajectoryBuilder(drive.getPoseEstimate())
+                    .lineToLinearHeading(new Pose2d(-64.38, -36, 0))
+                    .build();
+
+            drive.followTrajectory(line);
         }
     }
 }

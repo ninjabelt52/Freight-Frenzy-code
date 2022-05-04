@@ -22,7 +22,7 @@ public class LocalizationTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        drive.setPoseEstimate(new Pose2d(6.25, 65.38, Math.toRadians(270)));
+        drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(0)));
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
