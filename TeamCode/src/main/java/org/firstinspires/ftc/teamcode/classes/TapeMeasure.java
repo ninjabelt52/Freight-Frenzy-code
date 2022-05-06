@@ -179,7 +179,7 @@ public class TapeMeasure implements Runnable{
                 }
 
                 if (isOpen) {
-                    targetZ += gamepad1.right_stick_x * .0005 * slowSpeed;
+                    targetZ += gamepad1.right_stick_x * .001 * slowSpeed;
                     targetXAxis += -gamepad1.right_stick_y * .0005 * slowSpeed;
 
                     if (gamepad1.left_trigger > 0) {

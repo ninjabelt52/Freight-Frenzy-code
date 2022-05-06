@@ -178,10 +178,10 @@ public class GUIAutoRed extends LinearOpMode {
             }
 
             Trajectory collect1 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
-                    .splineTo(new Vector2d(24, -65), 0,
+                    .splineTo(new Vector2d(24, -66), 0,
                             SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                             SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                    .lineToLinearHeading(new Pose2d(49, -65, 0))
+                    .lineToLinearHeading(new Pose2d(49, -66, 0))
                     .addTemporalMarker(1.5, () -> {
                         intake.setPower(-1);
                         arm.moveArm(0, 1);
@@ -192,7 +192,7 @@ public class GUIAutoRed extends LinearOpMode {
             drive.followTrajectory(collect1);
 
             Trajectory backup1 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(24,-65, 0))
+                    .lineToLinearHeading(new Pose2d(24,-66, 0))
                     .addTemporalMarker(0, () ->{
                         arm.close();
                     })
@@ -220,8 +220,8 @@ public class GUIAutoRed extends LinearOpMode {
             arm.close();
 
             Trajectory collect2 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
-                    .splineTo(new Vector2d(24, -65), 0)
-                    .splineToConstantHeading(new Vector2d(52,-65), 0)
+                    .splineTo(new Vector2d(24, -66), 0)
+                    .splineToConstantHeading(new Vector2d(52,-66), 0)
                     .addTemporalMarker(1.5, () -> {
                         arm.moveArm(0, .5);
                         intake.setPower(-1);
@@ -232,7 +232,7 @@ public class GUIAutoRed extends LinearOpMode {
             drive.followTrajectory(collect2);
 
             Trajectory backup2 = drive.trajectoryBuilder(drive.getPoseEstimate(), true)
-                    .splineTo(new Vector2d(24,-65),Math.toRadians(-180))
+                    .splineTo(new Vector2d(24,-66),Math.toRadians(-180))
                     .addTemporalMarker(0, () ->{
                         arm.close();
                     })
@@ -261,8 +261,8 @@ public class GUIAutoRed extends LinearOpMode {
 
             if(backPark){
                 Trajectory park2 = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(new Vector2d(24, -65), 0)
-                        .lineToLinearHeading(new Pose2d(40.38, -65, 0))
+                        .splineTo(new Vector2d(24, -66), 0)
+                        .lineToLinearHeading(new Pose2d(40.38, -66, 0))
                         .addTemporalMarker(2, () -> {
                             arm.moveArm(0, .5);
                             intake.setPower(-1);
@@ -279,8 +279,8 @@ public class GUIAutoRed extends LinearOpMode {
                 drive.followTrajectory(parkBack);
             }else{
                 Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
-                        .splineTo(new Vector2d(24, -65), 0)
-                        .lineToLinearHeading(new Pose2d(43.38, -65, 0))
+                        .splineTo(new Vector2d(24, -66), 0)
+                        .lineToLinearHeading(new Pose2d(43.38, -66, 0))
                         .addTemporalMarker(2, () -> {
                             arm.moveArm(0, .5);
                             intake.setPower(-1);

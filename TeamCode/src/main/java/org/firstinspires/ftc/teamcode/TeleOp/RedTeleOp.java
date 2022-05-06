@@ -101,6 +101,14 @@ public class RedTeleOp extends LinearOpMode {
         timer.reset();
         while (opModeIsActive()) {
 
+            if (gamepad1.right_bumper || gamepad2.y) {
+                intake.setPower(1);
+            } else if (gamepad1.left_bumper || gamepad2.a) {
+                intake.setPower(-1);
+            } else {
+                intake.setPower(0);
+            }
+
             if(!tapeMeasure.isControlsActive()){
                 if(rumble1 && timer.seconds() >= 75){
                     gamepad1.rumble(500);
@@ -127,14 +135,6 @@ public class RedTeleOp extends LinearOpMode {
                 br.setPower(straight - strafe - rotation);
                 fl.setPower(straight - strafe + rotation);
                 fr.setPower(straight + strafe - rotation);
-
-                if (gamepad1.right_bumper) {
-                    intake.setPower(1);
-                } else if (gamepad1.left_bumper) {
-                    intake.setPower(-1);
-                } else {
-                    intake.setPower(0);
-                }
 
                 if (arm.getCurrentPosition() <= -400 && !(gamepad1.left_trigger > 0) && !(imu.getAngularOrientation().thirdAngle < (90 - 15))) {
                     arm.setTargetPosition(bottomLimit - 450);
