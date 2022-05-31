@@ -378,7 +378,7 @@ public class GUIAutoRed extends LinearOpMode {
             drive.followTrajectory(end);
 
             Trajectory line = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineToLinearHeading(new Pose2d(-64.38, -36, 0))
+                    .lineToLinearHeading(new Pose2d(-64.38, -40, 0))
                     .build();
 
             drive.followTrajectory(line);
