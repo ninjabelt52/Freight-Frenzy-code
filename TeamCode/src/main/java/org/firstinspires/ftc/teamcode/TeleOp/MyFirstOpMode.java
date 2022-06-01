@@ -17,10 +17,10 @@ public class MyFirstOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        frontleftMotor = hardwareMap.dcMotor.get("FrontLeft_Motor");
-        frontrightMotor = hardwareMap.dcMotor.get("FrontRight_Motor");
-        backleftMotor = hardwareMap.dcMotor.get("BackLeft_Motor");
-        backrightMotor = hardwareMap.dcMotor.get("BackRight_Motor");
+        frontleftMotor = hardwareMap.dcMotor.get("fl");
+        frontrightMotor = hardwareMap.dcMotor.get("fr");
+        backleftMotor = hardwareMap.dcMotor.get("bl");
+        backrightMotor = hardwareMap.dcMotor.get("br");
         waitForStart();
        while (opModeIsActive()) {
         frontleftMotor.setPower(power);
