@@ -28,6 +28,11 @@ public class MecanumDrive extends LinearOpMode {
             strafe = -gamepad1.left_stick_x;
             rotation = gamepad1.right_stick_x;
 
+            if(1==1){
+                telemetry.addData("Status","Hooray!");
+                telemetry.update();
+            }
+
             bl.setPower(straight + strafe + rotation);
             br.setPower(straight - strafe - rotation);
             fl.setPower(straight - strafe + rotation);
