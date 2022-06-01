@@ -33,14 +33,9 @@ public class MyFirstOpMode extends LinearOpMode {
         backrightMotor.setPower(power);
 
 
-        power = 0.0;
+        power = gamepad1.left_stick_y;
 
-        frontleftMotor.setPower(power);
-        frontrightMotor.setPower(power);
-        backleftMotor.setPower(power);
-        backrightMotor.setPower(power);
 
-        power = 0.5;
         }
     }
 }
