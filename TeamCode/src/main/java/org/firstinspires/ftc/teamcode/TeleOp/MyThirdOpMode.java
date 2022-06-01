@@ -24,8 +24,8 @@ public class MyThirdOpMode extends LinearOpMode {
         waitForStart();
        while (opModeIsActive()) {
         frontleftMotor.setPower(power);
-        frontrightMotor.setPower(-power);
-        backleftMotor.setPower(-power);
+        frontrightMotor.setPower(-power + 1);
+        backleftMotor.setPower(-power + 1);
         backrightMotor.setPower(power);
 
         sleep(2000);
