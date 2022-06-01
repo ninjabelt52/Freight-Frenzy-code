@@ -13,8 +13,9 @@ public class MyFirstOpMode extends LinearOpMode {
     DcMotor backleftMotor;
     DcMotor backrightMotor;
 
-    double power = 0.5;
-
+    double power = 0.0;
+    double rotation = 0.0;
+    double strafe = 0.0;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -27,15 +28,16 @@ public class MyFirstOpMode extends LinearOpMode {
         backleftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         waitForStart();
        while (opModeIsActive()) {
-        frontleftMotor.setPower(power);
-        frontrightMotor.setPower(power);
-        backleftMotor.setPower(power);
-        backrightMotor.setPower(power);
+        frontleftMotor.setPower(power+strafe+rotation);
+        frontrightMotor.setPower(power-strafe-rotation);
+        backleftMotor.setPower(power-strafe+rotation);
+        backrightMotor.setPower(power+strafe-rotation);
 
 
         power = gamepad1.left_stick_y;
+        rotation = gamepad1.right_stick_x;
+        strafe = gamepad1.left_stick_x;
 
-
-        }
+       }
     }
 }
