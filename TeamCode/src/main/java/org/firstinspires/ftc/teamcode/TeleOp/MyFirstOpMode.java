@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 public class MyFirstOpMode extends LinearOpMode {
@@ -21,6 +22,9 @@ public class MyFirstOpMode extends LinearOpMode {
         frontrightMotor = hardwareMap.dcMotor.get("fr");
         backleftMotor = hardwareMap.dcMotor.get("bl");
         backrightMotor = hardwareMap.dcMotor.get("br");
+
+        frontleftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backleftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         waitForStart();
        while (opModeIsActive()) {
         frontleftMotor.setPower(power);
@@ -28,7 +32,6 @@ public class MyFirstOpMode extends LinearOpMode {
         backleftMotor.setPower(power);
         backrightMotor.setPower(power);
 
-        sleep(2000);
 
         power = 0.0;
 
@@ -36,6 +39,8 @@ public class MyFirstOpMode extends LinearOpMode {
         frontrightMotor.setPower(power);
         backleftMotor.setPower(power);
         backrightMotor.setPower(power);
+
+        power = 0.5;
         }
     }
 }
