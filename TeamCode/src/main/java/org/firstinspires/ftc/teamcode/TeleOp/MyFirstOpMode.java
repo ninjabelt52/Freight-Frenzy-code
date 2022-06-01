@@ -36,7 +36,7 @@ public class MyFirstOpMode extends LinearOpMode {
 
         power = gamepad1.left_stick_y;
         rotation = gamepad1.right_stick_x;
-        strafe = gamepad1.left_stick_x;
+        strafe = -gamepad1.left_stick_x;
 
        }
     }
