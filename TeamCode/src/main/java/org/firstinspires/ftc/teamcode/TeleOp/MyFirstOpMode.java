@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,10 +13,12 @@ public class MyFirstOpMode extends LinearOpMode {
     DcMotor frontrightMotor;
     DcMotor backleftMotor;
     DcMotor backrightMotor;
+    BNO055IMU IMU;
 
     double power = 0.0;
     double rotation = 0.0;
     double strafe = 0.0;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -24,8 +27,22 @@ public class MyFirstOpMode extends LinearOpMode {
         backleftMotor = hardwareMap.dcMotor.get("bl");
         backrightMotor = hardwareMap.dcMotor.get("br");
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        IMU =hardwareMap.get(BNO055IMU.class,"IMU");
+        IMU.initialize(parameters);
+
         frontleftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backleftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        while (!IMU.isGyroCalibrated()) {
+            telemetry.addData("status","IMU is not calibrated");
+            telemetry.update();
+
+        }
+        telemetry.addData("status","IMU is calibrated");
+        telemetry.update();
+
         waitForStart();
        while (opModeIsActive()) {
         frontleftMotor.setPower(power+strafe+rotation);
@@ -38,6 +55,10 @@ public class MyFirstOpMode extends LinearOpMode {
         rotation = gamepad1.right_stick_x;
         strafe = -gamepad1.left_stick_x;
 
+        telemetry.addData("X axis rotation",IMU.getAngularOrientation().firstAngle);
+        telemetry.addData("Y axis rotation",IMU.getAngularOrientation().secondAngle);
+        telemetry.addData("Z axis rotation",IMU.getAngularOrientation().thirdAngle);
+        telemetry.update();
        }
     }
 }
