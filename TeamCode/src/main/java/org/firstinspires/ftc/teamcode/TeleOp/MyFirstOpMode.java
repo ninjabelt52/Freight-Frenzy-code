@@ -29,7 +29,7 @@ public class MyFirstOpMode extends LinearOpMode {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        IMU =hardwareMap.get(BNO055IMU.class,"IMU");
+        IMU =hardwareMap.get(BNO055IMU.class,"imu");
         IMU.initialize(parameters);
 
         frontleftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
