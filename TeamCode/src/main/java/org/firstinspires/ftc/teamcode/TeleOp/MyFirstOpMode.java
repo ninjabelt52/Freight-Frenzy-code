@@ -42,7 +42,7 @@ public class MyFirstOpMode extends LinearOpMode {
         }
         telemetry.addData("status","IMU is calibrated");
         telemetry.update();
-// Run
+//// Run
         waitForStart();
        while (opModeIsActive()) {
 // Motion
