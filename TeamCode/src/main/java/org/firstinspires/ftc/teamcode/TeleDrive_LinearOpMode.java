@@ -186,6 +186,8 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+
+
         String address = "192.168.43.1"; //Check "Program and Manage" tab on the Driver Station and verify the IP address
         int port = 11039; //Change as needed
         canRunGamepadThread = false;
@@ -211,39 +213,26 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
         DcMotor bl,br,fl,fr;
         double straight, strafe, rotation;
+        double xpower = 0.0;
+        double ypower = 0.0;
 
+        DcMotor leftMotor;
+        DcMotor rightMotor;
         straight = 0;
         strafe = 0;
         rotation = 0;
 
-        bl = hardwareMap.get(DcMotor.class, "bl");
-        br = hardwareMap.get(DcMotor.class, "br");
-        fl = hardwareMap.get(DcMotor.class, "fl");
-        fr = hardwareMap.get(DcMotor.class, "fr");
-
-        fl.setDirection(DcMotorSimple.Direction.REVERSE);
-        bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftMotor = hardwareMap.get(DcMotor.class, "l");
+        rightMotor = hardwareMap.get(DcMotor.class, "r");
 
         waitForStart();
         while (opModeIsActive()){
-            straight = -gamepad1.left_stick_y;
-            strafe = -gamepad1.left_stick_x;
-            rotation = gamepad1.right_stick_x;
-//
-//            if(gamepad1.y){
-//                straight = -1;
-//            }else if(gamepad1.a){
-//                straight = 1;
-//            }else if(gamepad1.x){
-//                strafe = 1;
-//            }else if(gamepad1.b){
-//                strafe = -1;
-//            }
 
-            bl.setPower(straight + strafe + rotation);
-            br.setPower(straight - strafe - rotation);
-            fl.setPower(straight - strafe + rotation);
-            fr.setPower(straight + strafe - rotation);
+            leftMotor.setPower(ypower+xpower);
+            rightMotor.setPower(ypower-xpower);
+
+            xpower = gamepad1.left_stick_x;
+            ypower = gamepad1.left_stick_y;
         }
     }
 }
