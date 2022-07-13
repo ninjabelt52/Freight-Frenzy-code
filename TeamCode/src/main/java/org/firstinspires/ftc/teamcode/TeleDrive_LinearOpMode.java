@@ -228,11 +228,53 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()){
 
-            leftMotor.setPower(ypower+xpower);
+            /*leftMotor.setPower(ypower+xpower);
             rightMotor.setPower(ypower-xpower);
 
             xpower = gamepad1.left_stick_x;
-            ypower = gamepad1.left_stick_y;
+            ypower = gamepad1.left_stick_y;*/
+
+            if (/* this.vars.ypower < this.vars.gamepad1.left_stick_y */) {
+                while (!(/* this.vars.ypower == this.vars.gamepad1.left_stick_y */)) {
+                    this.stage.vars.myGlobalVariable += 0.01;
+                    yield* this.wait(0.02);
+
+                    yield;
+                }
+
+            }
+
+            if (/* this.vars.ypower > this.vars.gamepad1.left_stick_y */) {
+                while (!(/* this.vars.ypower == this.vars.gamepad1.left_stick_y */)) {
+                    this..vars.ypower += -0.01;
+                    yield* this.wait(0.02);
+
+                    yield;
+                }
+
+            }
+
+            if (/* this.vars.xpower < this.vars.gamepad1.left_stick_x */) {
+                while (!(/* this.vars.xpower == this.vars.gamepad1.left_stick_x */)) {
+                    this.stage.vars.xpower += 0.01;
+                    yield* this.wait(0.005);
+
+                    yield;
+                }
+
+            }
+
+            if (/* this.vars.ypower > this.vars.gamepad1.left_stick_y */) {
+                while (!(/* this.vars.ypower == this.vars.gamepad1.left_stick_y */)) {
+                    this.stage.vars.ypower += -0.01;
+                    yield* this.wait(0.005);
+
+                    yield;
+                }
+
+            }
+
+
         }
     }
 }
