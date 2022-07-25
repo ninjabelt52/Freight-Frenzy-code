@@ -7,11 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 
 import java.net.DatagramPacket;
@@ -201,9 +203,6 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Connect your server to " + address + ":" + port, "");
         telemetry.update();
-
-        waitForStart();
-
         canRunGamepadThread = true;
 
         startGamepadHandlerThread();
@@ -216,65 +215,67 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         double xpower = 0.0;
         double ypower = 0.0;
 
+        DistanceSensor back, front, left, right;
+
         DcMotor leftMotor;
         DcMotor rightMotor;
         straight = 0;
         strafe = 0;
         rotation = 0;
+        double maxVal = .5;
 
         leftMotor = hardwareMap.get(DcMotor.class, "l");
         rightMotor = hardwareMap.get(DcMotor.class, "r");
+        back = hardwareMap.get(DistanceSensor.class, "back");
+        front = hardwareMap.get(DistanceSensor.class, "front");
+        left = hardwareMap.get(DistanceSensor.class, "left");
+        right = hardwareMap.get(DistanceSensor.class, "right");
 
         waitForStart();
         while (opModeIsActive()){
 
-            /*leftMotor.setPower(ypower+xpower);
-            rightMotor.setPower(ypower-xpower);
-
-            xpower = gamepad1.left_stick_x;
-            ypower = gamepad1.left_stick_y;*/
-
-            if (/* this.vars.ypower < this.vars.gamepad1.left_stick_y */) {
-                while (!(/* this.vars.ypower == this.vars.gamepad1.left_stick_y */)) {
-                    this.stage.vars.myGlobalVariable += 0.01;
-                    yield* this.wait(0.02);
-
-                    yield;
-                }
-
+            if (ypower < gamepad1.left_stick_y) {
+                ypower += .02;
             }
 
-            if (/* this.vars.ypower > this.vars.gamepad1.left_stick_y */) {
-                while (!(/* this.vars.ypower == this.vars.gamepad1.left_stick_y */)) {
-                    this..vars.ypower += -0.01;
-                    yield* this.wait(0.02);
-
-                    yield;
-                }
-
+            if (ypower > gamepad1.left_stick_y) {
+                ypower -= .02;
             }
 
-            if (/* this.vars.xpower < this.vars.gamepad1.left_stick_x */) {
-                while (!(/* this.vars.xpower == this.vars.gamepad1.left_stick_x */)) {
-                    this.stage.vars.xpower += 0.01;
-                    yield* this.wait(0.005);
-
-                    yield;
-                }
-
+            if (xpower < gamepad1.left_stick_x) {
+                xpower += .02;
             }
 
-            if (/* this.vars.ypower > this.vars.gamepad1.left_stick_y */) {
-                while (!(/* this.vars.ypower == this.vars.gamepad1.left_stick_y */)) {
-                    this.stage.vars.ypower += -0.01;
-                    yield* this.wait(0.005);
-
-                    yield;
-                }
-
+            if (xpower > gamepad1.left_stick_x) {
+                xpower -= .02;
             }
 
+            ypower = Math.min(maxVal, Math.abs(ypower));
+            xpower = Math.min(maxVal, Math.abs(xpower));
 
+            if(gamepad1.left_stick_x < 0){
+                xpower = -xpower;
+            }
+
+            if(gamepad1.left_stick_y < 0){
+                ypower = -ypower;
+            }
+
+            leftMotor.setPower(-ypower-xpower);
+            rightMotor.setPower(-ypower+xpower);
+
+            if(front.getDistance(DistanceUnit.CM) < 20 || back.getDistance(DistanceUnit.CM) < 20 || left.getDistance(DistanceUnit.CM) < 20 || right.getDistance(DistanceUnit.CM) < 20){
+                maxVal = .25;
+            }else{
+                maxVal = .5;
+            }
+
+            telemetry.addData("Distances in", "CM");
+            telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
+            telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
+            telemetry.addData("Left sensor", left.getDistance(DistanceUnit.CM));
+            telemetry.addData("Right sensor", right.getDistance(DistanceUnit.CM));
+            telemetry.update();
         }
     }
 }
