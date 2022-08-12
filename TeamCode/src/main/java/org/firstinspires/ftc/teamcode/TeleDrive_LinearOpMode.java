@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -187,9 +189,6 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-
-
         String address = "192.168.43.1"; //Check "Program and Manage" tab on the Driver Station and verify the IP address
         int port = 11039; //Change as needed
         canRunGamepadThread = false;
@@ -211,18 +210,16 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         //CUSTOM CODE GOES HERE
 
         DcMotor bl,br,fl,fr;
-        double straight, strafe, rotation;
+        double fdist, bdist, ldist, rdist;
         double xpower = 0.0;
         double ypower = 0.0;
+        double fMaxVal = .5, bMaxVal = .5;
+        double minOne, minTwo;
 
         DistanceSensor back, front, left, right;
 
         DcMotor leftMotor;
         DcMotor rightMotor;
-        straight = 0;
-        strafe = 0;
-        rotation = 0;
-        double maxVal = .5;
 
         leftMotor = hardwareMap.get(DcMotor.class, "l");
         rightMotor = hardwareMap.get(DcMotor.class, "r");
@@ -233,48 +230,48 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()){
+            fdist = front.getDistance(DistanceUnit.CM);
+            bdist = back.getDistance(DistanceUnit.CM);
+            ldist = left.getDistance(DistanceUnit.CM);
+            rdist = right.getDistance(DistanceUnit.CM);
 
-            if (ypower < gamepad1.left_stick_y) {
-                ypower += .02;
+            xpower = -.5 * (gamepad1.left_stick_x * .2) + (xpower * .8);
+            ypower = -(gamepad1.left_stick_y * .2) + (ypower * .8);
+            if(ypower > 0) {
+                ypower = ypower * fMaxVal;
+            }else if(ypower < 0){
+                ypower = ypower * bMaxVal;
             }
 
-            if (ypower > gamepad1.left_stick_y) {
-                ypower -= .02;
-            }
-
-            if (xpower < gamepad1.left_stick_x) {
-                xpower += .02;
-            }
-
-            if (xpower > gamepad1.left_stick_x) {
-                xpower -= .02;
-            }
-
-            ypower = Math.min(maxVal, Math.abs(ypower));
-            xpower = Math.min(maxVal, Math.abs(xpower));
-
-            if(gamepad1.left_stick_x < 0){
-                xpower = -xpower;
-            }
-
-            if(gamepad1.left_stick_y < 0){
-                ypower = -ypower;
-            }
-
-            leftMotor.setPower(-ypower-xpower);
-            rightMotor.setPower(-ypower+xpower);
-
-            if(front.getDistance(DistanceUnit.CM) < 20 || back.getDistance(DistanceUnit.CM) < 20 || left.getDistance(DistanceUnit.CM) < 20 || right.getDistance(DistanceUnit.CM) < 20){
-                maxVal = .25;
+            if(fdist < 30){
+                minOne = Math.min(ldist, rdist);
+                minTwo = Math.min(minOne, fdist);
+                fMaxVal = 1 * minTwo/30;
+                bMaxVal = 1;
+            }else if(bdist < 30){
+                minOne = Math.min(ldist, rdist);
+                minTwo = Math.min(minOne, bdist);
+                fMaxVal = 1;
+                bMaxVal = 1 * minTwo/30;
+            }else if(ldist < 30 || rdist < 30){
+                minOne = Math.min(ldist, rdist);
+                bMaxVal = 1 * minOne/30;
+                fMaxVal = 1 * minOne/30;
             }else{
-                maxVal = .5;
+                fMaxVal = 1;
+                bMaxVal = 1;
             }
+
+            leftMotor.setPower(ypower + xpower);
+            rightMotor.setPower(ypower - xpower);
 
             telemetry.addData("Distances in", "CM");
             telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
             telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
             telemetry.addData("Left sensor", left.getDistance(DistanceUnit.CM));
             telemetry.addData("Right sensor", right.getDistance(DistanceUnit.CM));
+            telemetry.addData("ypower", ypower);
+            telemetry.addData("xpower", xpower);
             telemetry.update();
         }
     }
