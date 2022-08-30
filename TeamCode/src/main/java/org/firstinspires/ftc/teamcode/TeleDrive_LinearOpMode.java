@@ -209,10 +209,9 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
         //CUSTOM CODE GOES HERE
 
-        DcMotor bl,br,fl,fr;
         double fdist, bdist, ldist, rdist;
-        double xpower = 0.0;
-        double ypower = 0.0;
+        double xPower = 0.0, prevXPower = xPower;
+        double yPower = 0.0, prevYPower = yPower;
         double fMaxVal = .5, bMaxVal = .5;
         double minOne, minTwo;
 
@@ -235,12 +234,12 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
             ldist = left.getDistance(DistanceUnit.CM);
             rdist = right.getDistance(DistanceUnit.CM);
 
-            xpower = -.5 * (gamepad1.left_stick_x * .2) + (xpower * .8);
-            ypower = -(gamepad1.left_stick_y * .2) + (ypower * .8);
-            if(ypower > 0) {
-                ypower = ypower * fMaxVal;
-            }else if(ypower < 0){
-                ypower = ypower * bMaxVal;
+            xPower = -.5 * ((gamepad1.left_stick_x * .2) + (prevXPower * .8));
+            yPower = -(gamepad1.left_stick_y * .2) + (prevYPower * .8);
+            if(yPower > 0) {
+                yPower = yPower * fMaxVal;
+            }else if(yPower < 0){
+                yPower = yPower * bMaxVal;
             }
 
             if(fdist < 30){
@@ -262,17 +261,20 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                 bMaxVal = 1;
             }
 
-            leftMotor.setPower(ypower + xpower);
-            rightMotor.setPower(ypower - xpower);
+            leftMotor.setPower(yPower + xPower);
+            rightMotor.setPower(yPower - xPower);
 
             telemetry.addData("Distances in", "CM");
             telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
             telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
             telemetry.addData("Left sensor", left.getDistance(DistanceUnit.CM));
             telemetry.addData("Right sensor", right.getDistance(DistanceUnit.CM));
-            telemetry.addData("ypower", ypower);
-            telemetry.addData("xpower", xpower);
+            telemetry.addData("yPower", yPower);
+            telemetry.addData("xPower", xPower);
             telemetry.update();
+
+            prevXPower = xPower;
+            prevYPower = yPower;
         }
     }
 }
