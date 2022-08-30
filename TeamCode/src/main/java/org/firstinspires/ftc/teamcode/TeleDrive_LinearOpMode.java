@@ -317,6 +317,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         }
 
         telemetry.addData("Status", "Initialized");
+        telemetry.addLine("foo");
         telemetry.addData("Connect your server to " + address + ":" + port, "");
         telemetry.update();
 
