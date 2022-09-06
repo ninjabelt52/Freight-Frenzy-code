@@ -234,32 +234,35 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
             ldist = left.getDistance(DistanceUnit.CM);
             rdist = right.getDistance(DistanceUnit.CM);
 
-            xPower = -.5 * ((gamepad1.left_stick_x * .2) + (prevXPower * .8));
-            yPower = -(gamepad1.left_stick_y * .2) + (prevYPower * .8);
-            if(yPower > 0) {
-                yPower = yPower * fMaxVal;
-            }else if(yPower < 0){
-                yPower = yPower * bMaxVal;
-            }
+            xPower = -.5 * gamepad1.left_stick_x;
+            yPower = -.5 * gamepad1.left_stick_y;
 
-            if(fdist < 30){
-                minOne = Math.min(ldist, rdist);
-                minTwo = Math.min(minOne, fdist);
-                fMaxVal = 1 * minTwo/30;
-                bMaxVal = 1;
-            }else if(bdist < 30){
-                minOne = Math.min(ldist, rdist);
-                minTwo = Math.min(minOne, bdist);
-                fMaxVal = 1;
-                bMaxVal = 1 * minTwo/30;
-            }else if(ldist < 30 || rdist < 30){
-                minOne = Math.min(ldist, rdist);
-                bMaxVal = 1 * minOne/30;
-                fMaxVal = 1 * minOne/30;
-            }else{
-                fMaxVal = 1;
-                bMaxVal = 1;
-            }
+//            xPower = -.5 * ((gamepad1.left_stick_x * .2) + (prevXPower * .8));
+//            yPower = -(gamepad1.left_stick_y * .2) + (prevYPower * .8);
+//            if(yPower > 0) {
+//                yPower = yPower * fMaxVal;
+//            }else if(yPower < 0){
+//                yPower = yPower * bMaxVal;
+//            }
+//
+//            if(fdist < 30){
+//                minOne = Math.min(ldist, rdist);
+//                minTwo = Math.min(minOne, fdist);
+//                fMaxVal = 1 * minTwo/30;
+//                bMaxVal = 1;
+//            }else if(bdist < 30){
+//                minOne = Math.min(ldist, rdist);
+//                minTwo = Math.min(minOne, bdist);
+//                fMaxVal = 1;
+//                bMaxVal = 1 * minTwo/30;
+//            }else if(ldist < 30 || rdist < 30){
+//                minOne = Math.min(ldist, rdist);
+//                bMaxVal = 1 * minOne/30;
+//                fMaxVal = 1 * minOne/30;
+//            }else{
+//                fMaxVal = 1;
+//                bMaxVal = 1;
+//            }
 
             leftMotor.setPower(yPower + xPower);
             rightMotor.setPower(yPower - xPower);
