@@ -200,15 +200,62 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         }
 
         telemetry.addData("Status", "Initialized");
+        telemetry.addLine("foo");
         telemetry.addData("Connect your server to " + address + ":" + port, "");
         telemetry.update();
+
+
+        final double INCREMENT   = 0.00025;
+        final double HOR_MAX_POS     =  1.0;
+        final double HOR_MIN_POS     =  .15;
+        final double VER_MAX_POS     =  .67;
+        final double VER_MIN_POS     =  .25;
+
+        Servo servo;
+        servo = hardwareMap.get(Servo.class, "horizontal");
+        Servo   servo2;
+        servo2 = hardwareMap.get(Servo.class, "vertical");
+        double  position = .72;
+        double  position2 = .43;
+        waitForStart();
         canRunGamepadThread = true;
 
         startGamepadHandlerThread();
 
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
 
-        //CUSTOM CODE GOES HERE
+                if(gamepad1.dpad_left){
+                    position = position-INCREMENT;
+                }
+                if(position<HOR_MIN_POS){
+                    position = HOR_MIN_POS;
+                }
+                if(gamepad1.dpad_right){
+                    position = position+INCREMENT;
+                }
+                if(position>HOR_MAX_POS){
+                    position = HOR_MAX_POS;
+                }
 
+                if(gamepad1.dpad_down){
+                    position2 = position2-INCREMENT;
+                }
+                if(position2<VER_MIN_POS){
+                    position2 = VER_MIN_POS;
+                }
+                if(gamepad1.dpad_up){
+                    position2 = position2+INCREMENT;
+                }
+                if(position2>VER_MAX_POS){
+                    position2 = VER_MAX_POS;
+                }
+
+                servo.setPosition(position);
+                servo2.setPosition(position2);
+                telemetry.addData("Horizontal Position", "%5.2f", position);
+                telemetry.addData("Vertical Position", "%5.2f", position2);
+                telemetry.update();
         double fdist, bdist, ldist, rdist;
         double xPower = 0.0, prevXPower = xPower;
         double yPower = 0.0, prevYPower = yPower;
@@ -264,6 +311,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
             leftMotor.setPower(yPower + xPower);
             rightMotor.setPower(yPower - xPower);
 
+
             telemetry.addData("Distances in", "CM");
             telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
             telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
@@ -272,6 +320,11 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
             telemetry.addData("yPower", yPower);
             telemetry.addData("xPower", xPower);
             telemetry.update();
+
+
+            }
+            canRunGamepadThread = false;
+            socket.close();
 
             prevXPower = xPower;
             prevYPower = yPower;
