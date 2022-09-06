@@ -379,13 +379,13 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                     position2 = .43;
                 }
                 if(gamepad1.b){
-                   //For quick position setting and other tweaks
+                   //For quick position setting and other tweaks.
                 }
                 if(gamepad1.x){
-                    //For quick position setting and other tweaks
+                    //For quick position setting and other tweaks.
                 }
                 if(gamepad1.y){
-                    //For quick position setting and other tweaks
+                    //For quick position setting and other tweaks.
                 }
 
                 servo.setPosition(position);
