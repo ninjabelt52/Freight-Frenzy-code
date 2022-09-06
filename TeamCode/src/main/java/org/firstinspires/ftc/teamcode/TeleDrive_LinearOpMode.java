@@ -22,6 +22,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 @TeleOp(name = "TeleDrive LinearOpMode", group = "")
+
 public class TeleDrive_LinearOpMode extends LinearOpMode {
     private DatagramSocket socket;
     private boolean canRunGamepadThread;
@@ -44,7 +45,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                     }
 
                     if (!gamepadAction.isEmpty()) {
-                        if(gamepadAction.contains("E-STOP")) {
+                        if (gamepadAction.contains("E-STOP")) {
                             requestOpModeStop();
                         }
                         if (gamepadAction.contains("G1")) {
@@ -202,18 +203,18 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Connect your server to " + address + ":" + port, "");
         telemetry.update();
-        final double INCREMENT   = 0.00025;
-        final double HOR_MAX_POS     =  1.0;
-        final double HOR_MIN_POS     =  .15;
-        final double VER_MAX_POS     =  .67;
-        final double VER_MIN_POS     =  .25;
+        final double INCREMENT = 0.00025;
+        final double HOR_MAX_POS = 1.0;
+        final double HOR_MIN_POS = .15;
+        final double VER_MAX_POS = .67;
+        final double VER_MIN_POS = .25;
 
         Servo servo;
         servo = hardwareMap.get(Servo.class, "horizontal");
-        Servo   servo2;
+        Servo servo2;
         servo2 = hardwareMap.get(Servo.class, "vertical");
-        double  position = .72;
-        double  position2 = .43;
+        double position = .72;
+        double position2 = .43;
         canRunGamepadThread = true;
 
         startGamepadHandlerThread();
@@ -240,7 +241,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         right = hardwareMap.get(DistanceSensor.class, "right");
 
         waitForStart();
-        while (opModeIsActive()){
+        while (opModeIsActive()) {
             fdist = front.getDistance(DistanceUnit.CM);
             bdist = back.getDistance(DistanceUnit.CM);
             ldist = left.getDistance(DistanceUnit.CM);
@@ -276,53 +277,53 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 //                bMaxVal = 1;
 //            }
 
-            if(gamepad1.dpad_left){
-                    position = position-INCREMENT;
-                }
-                if(position<HOR_MIN_POS){
-                    position = HOR_MIN_POS;
-                }
-                if(gamepad1.dpad_right){
-                    position = position+INCREMENT;
-                }
-                if(position>HOR_MAX_POS){
-                    position = HOR_MAX_POS;
-                }
-
-                if(gamepad1.dpad_down){
-                    position2 = position2-INCREMENT;
-                }
-                if(position2<VER_MIN_POS){
-                    position2 = VER_MIN_POS;
-                }
-                if(gamepad1.dpad_up){
-                    position2 = position2+INCREMENT;
-                }
-                if(position2>VER_MAX_POS){
-                    position2 = VER_MAX_POS;
-                }
-
-                servo.setPosition(position);
-                servo2.setPosition(position2);
-
-                leftMotor.setPower(yPower + xPower);
-                rightMotor.setPower(yPower - xPower);
-
-                telemetry.addData("Distances in", "CM");
-                telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
-                telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
-                telemetry.addData("Left sensor", left.getDistance(DistanceUnit.CM));
-                telemetry.addData("Right sensor", right.getDistance(DistanceUnit.CM));
-                telemetry.addData("yPower", yPower);
-                telemetry.addData("xPower", xPower);
-                telemetry.update();
-
-                prevXPower = xPower;
-                prevYPower = yPower;
-
+            if (gamepad1.dpad_left) {
+                position = position - INCREMENT;
             }
+            if (position < HOR_MIN_POS) {
+                position = HOR_MIN_POS;
+            }
+            if (gamepad1.dpad_right) {
+                position = position + INCREMENT;
+            }
+            if (position > HOR_MAX_POS) {
+                position = HOR_MAX_POS;
+            }
+            if (gamepad1.dpad_down) {
+                position2 = position2 - INCREMENT;
+            }
+            if (position2 < VER_MIN_POS) {
+                position2 = VER_MIN_POS;
+            }
+            if (gamepad1.dpad_up) {
+                position2 = position2 + INCREMENT;
+            }
+            if (position2 > VER_MAX_POS) {
+                position2 = VER_MAX_POS;
+            }
+
+            servo.setPosition(position);
+            servo2.setPosition(position2);
+
+            leftMotor.setPower(yPower + xPower);
+            rightMotor.setPower(yPower - xPower);
+
+            telemetry.addData("Distances in", "CM");
+            telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
+            telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
+            telemetry.addData("Left sensor", left.getDistance(DistanceUnit.CM));
+            telemetry.addData("Right sensor", right.getDistance(DistanceUnit.CM));
+            telemetry.addData("yPower", yPower);
+            telemetry.addData("xPower", xPower);
+            telemetry.update();
+
+            prevXPower = xPower;
+            prevYPower = yPower;
+
+
             canRunGamepadThread = false;
             socket.close();
+
         }
     }
 }
