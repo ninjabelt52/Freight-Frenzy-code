@@ -320,7 +320,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         telemetry.addLine("foo");
         telemetry.addData("Connect your server to " + address + ":" + port, "");
         telemetry.update();
-
+        //initialization
         final double INCREMENT   = 0.00025;
         final double HOR_MAX_POS     =  1.0;
         final double HOR_MIN_POS     =  .15;
@@ -345,6 +345,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         if (opModeIsActive()) {
             while (opModeIsActive()) {
 
+                //setting up/down servo position
                 if(gamepad1.dpad_left){
                     position = position-INCREMENT;
                 }
@@ -358,6 +359,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                     position = HOR_MAX_POS;
                 }
 
+                //setting left/right servo position
                 if(gamepad1.dpad_down){
                     position2 = position2-INCREMENT;
                 }
@@ -369,6 +371,21 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                 }
                 if(position2>VER_MAX_POS){
                     position2 = VER_MAX_POS;
+                }
+
+                if(gamepad1.a){
+                    //setting center position
+                    position = .72;
+                    position2 = .43;
+                }
+                if(gamepad1.b){
+                   //For quick position setting and other tweaks
+                }
+                if(gamepad1.x){
+                    //For quick position setting and other tweaks
+                }
+                if(gamepad1.y){
+                    //For quick position setting and other tweaks
                 }
 
                 servo.setPosition(position);
