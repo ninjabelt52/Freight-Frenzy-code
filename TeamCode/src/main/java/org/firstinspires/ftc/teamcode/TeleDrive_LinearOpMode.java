@@ -214,6 +214,20 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
 
         //CUSTOM CODE GOES HERE
+        //Camera init code
+        final double INCREMENT = 0.00025;
+        final double HOR_MAX_POS = 1.0;
+        final double HOR_MIN_POS = .15;
+        final double VER_MAX_POS = .67;
+        final double VER_MIN_POS = .25;
+
+        Servo servo;
+        servo = hardwareMap.get(Servo.class, "horizontal");
+        Servo servo2;
+        servo2 = hardwareMap.get(Servo.class, "vertical");
+        double position = .72;
+        double position2 = .43;
+        canRunGamepadThread = true;
 
         DcMotor bl,br,fl,fr;
         double fdist, bdist, ldist, rdist;
@@ -240,9 +254,38 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
             bdist = back.getDistance(DistanceUnit.CM);
             ldist = left.getDistance(DistanceUnit.CM);
             rdist = right.getDistance(DistanceUnit.CM);
+            
+            if (gamepad1.dpad_left) {
+                position = position - INCREMENT;
+            }
+            if (position < HOR_MIN_POS) {
+                position = HOR_MIN_POS;
+            }
+            if (gamepad1.dpad_right) {
+                position = position + INCREMENT;
+            }
+            if (position > HOR_MAX_POS) {
+                position = HOR_MAX_POS;
+            }
+            if (gamepad1.dpad_down) {
+                position2 = position2 - INCREMENT;
+            }
+            if (position2 < VER_MIN_POS) {
+                position2 = VER_MIN_POS;
+            }
+            if (gamepad1.dpad_up) {
+                position2 = position2 + INCREMENT;
+            }
+            if (position2 > VER_MAX_POS) {
+                position2 = VER_MAX_POS;
+            }
+
+            servo.setPosition(position);
+            servo2.setPosition(position2);
 
             xPower = -(gamepad1.left_stick_x * .2) + (prevXPower * .8);
             yPower = -(gamepad1.left_stick_y * .2) + (prevYPower * .8);
+            
             if(yPower > 0) {
                 yPower = yPower * fMaxVal;
             }else if(yPower < 0){
