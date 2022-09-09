@@ -37,6 +37,7 @@ public class MecanumDrive extends LinearOpMode {
             br.setPower(straight - strafe - rotation);
             fl.setPower(straight - strafe + rotation);
             fr.setPower(straight + strafe - rotation);
+            //Hello world!!!
         }
     }
 }
