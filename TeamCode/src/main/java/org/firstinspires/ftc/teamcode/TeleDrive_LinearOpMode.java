@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,11 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 
 import java.net.DatagramPacket;
@@ -22,6 +26,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
     private DatagramSocket socket;
     private boolean canRunGamepadThread;
     private Thread gamepadHandler;
+    public String telem = "";
 
     private void startGamepadHandlerThread() {
         telemetry.setAutoClear(true);
@@ -44,6 +49,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                             requestOpModeStop();
                         }
                         if (gamepadAction.contains("G1")) {
+                            telem = gamepadAction;
                             if (gamepadAction.contains("_A")) {
                                 if (gamepadAction.contains("P")) {
                                     gamepad1.a = true;
@@ -162,15 +168,19 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                             }
                             if (gamepadAction.contains("_LX_")) {
                                 gamepad1.left_stick_x = Float.parseFloat(gamepadAction.replace("G1_LX_", ""));
+                                telem = gamepadAction;
                             }
                             if (gamepadAction.contains("_LY_")) {
                                 gamepad1.left_stick_y = Float.parseFloat(gamepadAction.replace("G1_LY_", ""));
+                                telem = gamepadAction;
                             }
                             if (gamepadAction.contains("_RX_")) {
                                 gamepad1.right_stick_x = Float.parseFloat(gamepadAction.replace("G1_RX_", ""));
+                                telem = gamepadAction;
                             }
                             if (gamepadAction.contains("_RY_")) {
                                 gamepad1.right_stick_y = Float.parseFloat(gamepadAction.replace("G1_RY_", ""));
+                                telem = gamepadAction;
                             }
                         }
                     }
@@ -185,7 +195,6 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
         String address = "192.168.43.1"; //Check "Program and Manage" tab on the Driver Station and verify the IP address
         int port = 11039; //Change as needed
         canRunGamepadThread = false;
@@ -199,9 +208,6 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Connect your server to " + address + ":" + port, "");
         telemetry.update();
-
-        waitForStart();
-
         canRunGamepadThread = true;
 
         startGamepadHandlerThread();
@@ -210,40 +216,73 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         //CUSTOM CODE GOES HERE
 
         DcMotor bl,br,fl,fr;
-        double straight, strafe, rotation;
+        double fdist, bdist, ldist, rdist;
+        double xPower = 0.0, prevXPower = xPower;
+        double yPower = 0.0, prevYPower = yPower;
+        double fMaxVal = .5, bMaxVal = .5;
+        double minOne, minTwo;
 
-        straight = 0;
-        strafe = 0;
-        rotation = 0;
+        DistanceSensor back, front, left, right;
 
-        bl = hardwareMap.get(DcMotor.class, "bl");
-        br = hardwareMap.get(DcMotor.class, "br");
-        fl = hardwareMap.get(DcMotor.class, "fl");
-        fr = hardwareMap.get(DcMotor.class, "fr");
+        DcMotor leftMotor;
+        DcMotor rightMotor;
 
-        fl.setDirection(DcMotorSimple.Direction.REVERSE);
-        bl.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftMotor = hardwareMap.get(DcMotor.class, "l");
+        rightMotor = hardwareMap.get(DcMotor.class, "r");
+        back = hardwareMap.get(DistanceSensor.class, "back");
+        front = hardwareMap.get(DistanceSensor.class, "front");
+        left = hardwareMap.get(DistanceSensor.class, "left");
+        right = hardwareMap.get(DistanceSensor.class, "right");
 
         waitForStart();
         while (opModeIsActive()){
-            straight = -gamepad1.left_stick_y;
-            strafe = -gamepad1.left_stick_x;
-            rotation = gamepad1.right_stick_x;
-//
-//            if(gamepad1.y){
-//                straight = -1;
-//            }else if(gamepad1.a){
-//                straight = 1;
-//            }else if(gamepad1.x){
-//                strafe = 1;
-//            }else if(gamepad1.b){
-//                strafe = -1;
-//            }
+            fdist = front.getDistance(DistanceUnit.CM);
+            bdist = back.getDistance(DistanceUnit.CM);
+            ldist = left.getDistance(DistanceUnit.CM);
+            rdist = right.getDistance(DistanceUnit.CM);
 
-            bl.setPower(straight + strafe + rotation);
-            br.setPower(straight - strafe - rotation);
-            fl.setPower(straight - strafe + rotation);
-            fr.setPower(straight + strafe - rotation);
+            xPower = -(gamepad1.left_stick_x * .2) + (prevXPower * .8);
+            yPower = -(gamepad1.left_stick_y * .2) + (prevYPower * .8);
+            if(yPower > 0) {
+                yPower = yPower * fMaxVal;
+            }else if(yPower < 0){
+                yPower = yPower * bMaxVal;
+            }
+
+            if(fdist < 30){
+                minOne = Math.min(ldist, rdist);
+                minTwo = Math.min(minOne, fdist);
+                fMaxVal = 1 * minTwo/30;
+                bMaxVal = 1;
+            }else if(bdist < 30){
+                minOne = Math.min(ldist, rdist);
+                minTwo = Math.min(minOne, bdist);
+                fMaxVal = 1;
+                bMaxVal = 1 * minTwo/30;
+            }else if(ldist < 30 || rdist < 30){
+                minOne = Math.min(ldist, rdist);
+                bMaxVal = 1 * minOne/30;
+                fMaxVal = 1 * minOne/30;
+            }else{
+                fMaxVal = 1;
+                bMaxVal = 1;
+            }
+
+            leftMotor.setPower((yPower + xPower)*.75);
+            rightMotor.setPower((yPower - xPower)*.75);
+
+            telemetry.addData("Distances in", "CM");
+            telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
+            telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
+            telemetry.addData("Left sensor", left.getDistance(DistanceUnit.CM));
+            telemetry.addData("Right sensor", right.getDistance(DistanceUnit.CM));
+            telemetry.addData("yPower", yPower);
+            telemetry.addData("xPower", xPower);
+            telemetry.addData("Telemetry", telem);
+            telemetry.update();
+
+            prevXPower = xPower;
+            prevYPower = yPower;
         }
     }
 }
