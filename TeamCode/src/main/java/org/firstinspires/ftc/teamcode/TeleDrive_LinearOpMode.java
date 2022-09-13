@@ -2,7 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,6 +16,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
     private DatagramSocket socket;
     private boolean canRunGamepadThread;
     private Thread gamepadHandler;
+    public String telem = "";
 
     private void startGamepadHandlerThread() {
         telemetry.setAutoClear(true);
@@ -34,6 +39,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                             requestOpModeStop();
                         }
                         if (gamepadAction.contains("G1")) {
+                            telem = gamepadAction;
                             if (gamepadAction.contains("_A")) {
                                 if (gamepadAction.contains("P")) {
                                     gamepad1.a = true;
@@ -152,15 +158,19 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                             }
                             if (gamepadAction.contains("_LX")) {
                                 gamepad1.left_stick_x = Float.parseFloat(gamepadAction.replace("G1_LX_", ""));
+                                telem = gamepadAction;
                             }
                             if (gamepadAction.contains("_LY")) {
                                 gamepad1.left_stick_y = Float.parseFloat(gamepadAction.replace("G1_LY_", ""));
+                                telem = gamepadAction;
                             }
                             if (gamepadAction.contains("_RX")) {
                                 gamepad1.right_stick_x = Float.parseFloat(gamepadAction.replace("G1_RX_", ""));
+                                telem = gamepadAction;
                             }
                             if (gamepadAction.contains("_RY")) {
                                 gamepad1.right_stick_y = Float.parseFloat(gamepadAction.replace("G1_RY_", ""));
+                                telem = gamepadAction;
                             }
                         }
                         if (gamepadAction.contains("G2")) {
@@ -317,11 +327,13 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
         }
 
         telemetry.addData("Status", "Initialized");
-        telemetry.addLine("foo");
         telemetry.addData("Connect your server to " + address + ":" + port, "");
         telemetry.update();
+        canRunGamepadThread = true;
 
-        final double INCREMENT   = 0.00025;
+        startGamepadHandlerThread();
+
+        final double INCREMENT   = 0.0025;
         final double HOR_MAX_POS     =  1.0;
         final double HOR_MIN_POS     =  .15;
         final double VER_MAX_POS     =  .67;
@@ -329,58 +341,107 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
         Servo servo;
         servo = hardwareMap.get(Servo.class, "horizontal");
-        Servo   servo2;
+        Servo servo2;
         servo2 = hardwareMap.get(Servo.class, "vertical");
-        double  position = .72;
-        double  position2 = .43;
-        waitForStart();
+        double position = .72;
+        double position2 = .43;
         canRunGamepadThread = true;
+        DcMotor bl,br,fl,fr;
+        double fdist, bdist, ldist, rdist;
+        double xPower = 0.0, prevXPower = xPower;
+        double yPower = 0.0, prevYPower = yPower;
+        double fMaxVal = .5, bMaxVal = .5;
+        double minOne, minTwo;
 
-        startGamepadHandlerThread();
+        DistanceSensor back, front, left, right;
 
+        DcMotor leftMotor;
+        DcMotor rightMotor;
 
-        //CUSTOM CODE GOES HERE
+        leftMotor = hardwareMap.get(DcMotor.class, "l");
+        rightMotor = hardwareMap.get(DcMotor.class, "r");
+        back = hardwareMap.get(DistanceSensor.class, "back");
+        front = hardwareMap.get(DistanceSensor.class, "front");
+        left = hardwareMap.get(DistanceSensor.class, "left");
+        right = hardwareMap.get(DistanceSensor.class, "right");
 
         waitForStart();
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
+        while (opModeIsActive()){
+            fdist = front.getDistance(DistanceUnit.CM);
+            bdist = back.getDistance(DistanceUnit.CM);
+            ldist = left.getDistance(DistanceUnit.CM);
+            rdist = right.getDistance(DistanceUnit.CM);
 
-                if(gamepad1.dpad_left){
-                    position = position-INCREMENT;
-                }
-                if(position<HOR_MIN_POS){
-                    position = HOR_MIN_POS;
-                }
-                if(gamepad1.dpad_right){
-                    position = position+INCREMENT;
-                }
-                if(position>HOR_MAX_POS){
-                    position = HOR_MAX_POS;
-                }
-
-                if(gamepad1.dpad_down){
-                    position2 = position2-INCREMENT;
-                }
-                if(position2<VER_MIN_POS){
-                    position2 = VER_MIN_POS;
-                }
-                if(gamepad1.dpad_up){
-                    position2 = position2+INCREMENT;
-                }
-                if(position2>VER_MAX_POS){
-                    position2 = VER_MAX_POS;
-                }
-
-                servo.setPosition(position);
-                servo2.setPosition(position2);
-                telemetry.addData("Horizontal Position", "%5.2f", position);
-                telemetry.addData("Vertical Position", "%5.2f", position2);
-                telemetry.update();
-
-
+            if (gamepad1.dpad_left) {
+                position = position - INCREMENT;
             }
-            canRunGamepadThread = false;
-            socket.close();
+            if (position < HOR_MIN_POS) {
+                position = HOR_MIN_POS;
+            }
+            if (gamepad1.dpad_right) {
+                position = position + INCREMENT;
+            }
+            if (position > HOR_MAX_POS) {
+                position = HOR_MAX_POS;
+            }
+            if (gamepad1.dpad_down) {
+                position2 = position2 - INCREMENT;
+            }
+            if (position2 < VER_MIN_POS) {
+                position2 = VER_MIN_POS;
+            }
+            if (gamepad1.dpad_up) {
+                position2 = position2 + INCREMENT;
+            }
+            if (position2 > VER_MAX_POS) {
+                position2 = VER_MAX_POS;
+            }
+
+            servo.setPosition(position);
+            servo2.setPosition(position2);
+
+            xPower = -(gamepad1.left_stick_x * .2) + (prevXPower * .8);
+            yPower = -(gamepad1.left_stick_y * .2) + (prevYPower * .8);
+            if(yPower > 0) {
+                yPower = yPower * fMaxVal;
+            }else if(yPower < 0){
+                yPower = yPower * bMaxVal;
+            }
+
+            if(fdist < 30){
+                minOne = Math.min(ldist, rdist);
+                minTwo = Math.min(minOne, fdist);
+                fMaxVal = 1 * minTwo/30;
+                bMaxVal = 1;
+            }else if(bdist < 30){
+                minOne = Math.min(ldist, rdist);
+                minTwo = Math.min(minOne, bdist);
+                fMaxVal = 1;
+                bMaxVal = 1 * minTwo/30;
+            }else if(ldist < 30 || rdist < 30){
+                minOne = Math.min(ldist, rdist);
+                bMaxVal = 1 * minOne/30;
+                fMaxVal = 1 * minOne/30;
+            }else{
+                fMaxVal = 1;
+                bMaxVal = 1;
+            }
+
+            leftMotor.setPower((yPower + xPower));
+            rightMotor.setPower((yPower - xPower));
+
+            telemetry.addData("Distances in", "CM");
+            telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
+            telemetry.addData("Front sensor", front.getDistance(DistanceUnit.CM));
+            telemetry.addData("Left sensor", left.getDistance(DistanceUnit.CM));
+            telemetry.addData("Right sensor", right.getDistance(DistanceUnit.CM));
+            telemetry.addData("yPower", yPower);
+            telemetry.addData("xPower", xPower);
+            telemetry.addData("Telemetry", telem);
+            telemetry.update();
+
+            prevXPower = xPower;
+            prevYPower = yPower;
         }
     }
 }
