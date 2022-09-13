@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -214,8 +215,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
 
         //CUSTOM CODE GOES HERE
-        //Camera init code
-        final double INCREMENT = 0.00025;
+        final double INCREMENT = 0.025;
         final double HOR_MAX_POS = 1.0;
         final double HOR_MIN_POS = .15;
         final double VER_MAX_POS = .67;
@@ -254,7 +254,7 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
             bdist = back.getDistance(DistanceUnit.CM);
             ldist = left.getDistance(DistanceUnit.CM);
             rdist = right.getDistance(DistanceUnit.CM);
-            
+
             if (gamepad1.dpad_left) {
                 position = position - INCREMENT;
             }
@@ -285,7 +285,6 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
 
             xPower = -(gamepad1.left_stick_x * .2) + (prevXPower * .8);
             yPower = -(gamepad1.left_stick_y * .2) + (prevYPower * .8);
-            
             if(yPower > 0) {
                 yPower = yPower * fMaxVal;
             }else if(yPower < 0){
@@ -311,8 +310,8 @@ public class TeleDrive_LinearOpMode extends LinearOpMode {
                 bMaxVal = 1;
             }
 
-            leftMotor.setPower((yPower + xPower)*.75);
-            rightMotor.setPower((yPower - xPower)*.75);
+            leftMotor.setPower((yPower + xPower));
+            rightMotor.setPower((yPower - xPower));
 
             telemetry.addData("Distances in", "CM");
             telemetry.addData("Back sensor", back.getDistance(DistanceUnit.CM));
