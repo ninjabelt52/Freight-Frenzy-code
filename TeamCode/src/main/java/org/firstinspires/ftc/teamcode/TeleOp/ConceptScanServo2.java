@@ -43,13 +43,17 @@ public class ConceptScanServo2 extends LinearOpMode {
     static final double MIN_POS     =  0.0;     // Minimum rotational position
 
     // Define class members
-    Servo   servo;
-    double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
 
 
     @Override
     public void runOpMode() {
 
+        Servo   servo;
+        servo = hardwareMap.get(Servo.class, "horizontal");
+        Servo   servo2;
+        servo2 = hardwareMap.get(Servo.class, "vertical");
+        double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
+        double  position2 = (MAX_POS - MIN_POS) / 2;
 
 
 
@@ -68,8 +72,23 @@ public class ConceptScanServo2 extends LinearOpMode {
                 position = MAX_POS;
             }
 
+            if(gamepad1.dpad_down){
+                position2 = position2-INCREMENT;
+            }
+            if(position2<MIN_POS){
+                position2 = MIN_POS;
+            }
+            if(gamepad1.dpad_up){
+                position2 = position2+INCREMENT;
+            }
+            if(position2>MAX_POS){
+                position2 = MAX_POS;
+            }
+
             servo.setPosition(position);
-            telemetry.addData("Servo Position", "%5.2f", position);
+            servo2.setPosition(position2);
+            telemetry.addData("Horizontal Position", "%5.2f", position);
+            telemetry.addData("Vertical Position", "%5.2f", position2);
             telemetry.update();
         }
 
