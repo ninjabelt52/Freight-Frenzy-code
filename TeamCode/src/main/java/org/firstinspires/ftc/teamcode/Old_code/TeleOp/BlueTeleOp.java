@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.Old_code.TeleOp;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -16,8 +16,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 
 @Config
-@TeleOp(name = "RED Freight Frenzy TeleOp", group = "RED")
-public class RedTeleOp extends LinearOpMode {
+@TeleOp(name = "BLUE Freight Frenzy TeleOp", group = "BLUE")
+public class BlueTeleOp extends LinearOpMode {
     public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2, straight, strafe, rotation;
     public static int BOTTOM = 175, MIDDLE = 250, HIGH = 350;
     public int targetPos = 0;
@@ -35,7 +35,7 @@ public class RedTeleOp extends LinearOpMode {
         boolean toggle = false, armState = false, toggle2 = false, toggle3 = false;
         boolean rumble1 = true, rumble2 = true, rumble3 = true;
         String currentTarget = "top";
-        TapeMeasure tapeMeasure = new TapeMeasure(hardwareMap, gamepad1,gamepad2, TapeMeasure.Side.RED);
+        TapeMeasure tapeMeasure = new TapeMeasure(hardwareMap, gamepad1,gamepad2, TapeMeasure.Side.BLUE);
         Thread tapeMeasureThread = new Thread(tapeMeasure);
 
         ElapsedTime timer = new ElapsedTime();
@@ -101,9 +101,9 @@ public class RedTeleOp extends LinearOpMode {
         timer.reset();
         while (opModeIsActive()) {
 
-            if (gamepad1.right_bumper || gamepad2.y) {
+            if (gamepad1.right_bumper) {
                 intake.setPower(1);
-            } else if (gamepad1.left_bumper || gamepad2.a) {
+            } else if (gamepad1.left_bumper) {
                 intake.setPower(-1);
             } else {
                 intake.setPower(0);
