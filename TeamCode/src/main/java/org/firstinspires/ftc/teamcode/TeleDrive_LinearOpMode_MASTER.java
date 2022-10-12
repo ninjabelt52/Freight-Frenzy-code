@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
-@TeleOp(name = "TeleDrive LinearOpMode", group = "")
+@TeleOp(name = "TeleDrive-MASTER", group = "")
 public class TeleDrive_LinearOpMode_MASTER extends LinearOpMode {
     private DatagramSocket socket;
     private boolean canRunGamepadThread;
