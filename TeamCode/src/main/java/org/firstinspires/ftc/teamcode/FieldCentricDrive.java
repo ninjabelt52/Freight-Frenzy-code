@@ -144,8 +144,8 @@ public class FieldCentricDrive extends LinearOpMode {
 
             telemetry.addData("heading", heading);
 
-            double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+            double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
+            double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
             double rightX = gamepad1.right_stick_x;
             double radientsHeding = angles.firstAngle * Math.PI/180;
             final double v1 = r * Math.cos(robotAngle - radientsHeding) + rightX;
