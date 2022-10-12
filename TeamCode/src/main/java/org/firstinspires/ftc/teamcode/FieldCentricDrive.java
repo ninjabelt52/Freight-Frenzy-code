@@ -142,7 +142,7 @@ public class FieldCentricDrive extends LinearOpMode {
             double turn  =  gamepad1.right_stick_x;
 
             telemetry.addData("heading", heading);
-/**
+
             double temp = drive* Math.cos(heading) + turn* Math.sin(heading);
             turn = -drive* Math.sin(heading) + turn* Math.cos(heading);
             drive = temp;
@@ -151,7 +151,12 @@ public class FieldCentricDrive extends LinearOpMode {
             rightBackPower   = Range.clip(drive - turn, -1.0, 1.0) ;
             leftFrontPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             rightFrontPower   = Range.clip(drive - turn, -1.0, 1.0) ;
- **/
+
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+ /**
             double backLeftFrontRightPwr = -(Math.sqrt(turn*turn+drive*drive))*(Math.sin(heading)-Math.cos(heading));
             double backRightFrontLeftPwr = (Math.sqrt(turn*turn + drive*drive))*(Math.sin(heading)+ Math.cos(heading));
 
@@ -159,7 +164,7 @@ public class FieldCentricDrive extends LinearOpMode {
             rightBackDrive.setPower(backRightFrontLeftPwr);
             leftFrontDrive.setPower(backRightFrontLeftPwr);
             rightFrontDrive.setPower(backLeftFrontRightPwr);
-
+**/
             if(angles.firstAngle > 0){
                 blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
             }else{
