@@ -140,13 +140,25 @@ public class FieldCentricDrive extends LinearOpMode {
             // - This uses basic math to combine motions and is easier to drive straight.
             double drive = -gamepad1.left_stick_y;
             double turn  =  gamepad1.right_stick_x;
+            double drift =  gamepad1.left_stick_x;
 
             telemetry.addData("heading", heading);
 
-            double temp = drive* Math.cos(heading) + turn* Math.sin(heading);
-            turn = -drive* Math.sin(heading) + turn* Math.cos(heading);
-            drive = temp;
+            double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
+            double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+            double rightX = gamepad1.right_stick_x;
+            final double v1 = r * Math.cos(robotAngle - heading) + rightX;
+            final double v2 = r * Math.sin(robotAngle - heading) - rightX;
+            final double v3 = r * Math.sin(robotAngle - heading) + rightX;
+            final double v4 = r * Math.cos(robotAngle - heading) - rightX;
 
+            leftFrontDrive.setPower(v1);
+            rightFrontDrive.setPower(v2);
+            leftBackDrive.setPower(v3);
+            rightBackDrive.setPower(v4);
+
+
+/**
             leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             rightBackPower   = Range.clip(drive - turn, -1.0, 1.0) ;
             leftFrontPower    = Range.clip(drive + turn, -1.0, 1.0) ;
@@ -156,7 +168,7 @@ public class FieldCentricDrive extends LinearOpMode {
             rightBackDrive.setPower(rightBackPower);
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
- /**
+
             double backLeftFrontRightPwr = -(Math.sqrt(turn*turn+drive*drive))*(Math.sin(heading)-Math.cos(heading));
             double backRightFrontLeftPwr = (Math.sqrt(turn*turn + drive*drive))*(Math.sin(heading)+ Math.cos(heading));
 
