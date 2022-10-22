@@ -27,7 +27,7 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -50,13 +50,13 @@ import java.util.concurrent.TimeUnit;
  * Displays the first pattern upon init.
  */
 @TeleOp(name="BlinkinExample")
-@Disabled
+//@Disabled
 public class SampleRevBlinkinLedDriver extends OpMode {
 
     /*
-     * Change the pattern every 10 seconds in AUTO mode.
+     * Change the pattern every 200 seconds in AUTO mode.
      */
-    private final static int LED_PERIOD = 10;
+    private final static int LED_PERIOD = 200;
 
     /*
      * Rate limit gamepad button presses to every 500ms.
@@ -89,7 +89,7 @@ public class SampleRevBlinkinLedDriver extends OpMode {
         display = telemetry.addData("Display Kind: ", displayKind.toString());
         patternName = telemetry.addData("Pattern: ", pattern.toString());
 
-        ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.SECONDS);
+        ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.MILLISECONDS);
         gamepadRateLimit = new Deadline(GAMEPAD_LOCKOUT, TimeUnit.MILLISECONDS);
     }
 
@@ -150,7 +150,13 @@ public class SampleRevBlinkinLedDriver extends OpMode {
     protected void doAutoDisplay()
     {
         if (ledCycleDeadline.hasExpired()) {
-            pattern = pattern.next();
+            if (pattern == RevBlinkinLedDriver.BlinkinPattern.GREEN){
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+                pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+            }else{
+                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+                pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+            }
             displayPattern();
             ledCycleDeadline.reset();
         }
