@@ -34,6 +34,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -85,7 +86,7 @@ public class FieldCentricDrive extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        RevBlinkinLedDriver blinkinLedDriver;
+        //RevBlinkinLedDriver blinkinLedDriver;
         RevBlinkinLedDriver.BlinkinPattern pattern;
 
         //imu set up!
@@ -94,8 +95,12 @@ public class FieldCentricDrive extends LinearOpMode {
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
         parameters.loggingEnabled      = true;
         parameters.loggingTag          = "IMU";
+        DcMotor Lift1;
+        DcMotor Lift2;
+        CRServo Slurper;
 
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
+
+        //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
@@ -109,6 +114,11 @@ public class FieldCentricDrive extends LinearOpMode {
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "right_front_drive");
+
+        Lift1 = hardwareMap.get(DcMotor.class, "Lift1");
+        Lift2 = hardwareMap.get(DcMotor.class, "Lift2");
+        Slurper = hardwareMap.get(CRServo.class, "Slurper");
+
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -133,6 +143,7 @@ public class FieldCentricDrive extends LinearOpMode {
             double leftFrontPower;
             double rightFrontPower;
             double rightBackPower;
+            double SlurperPower = 0.0;
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
@@ -157,6 +168,25 @@ public class FieldCentricDrive extends LinearOpMode {
             rightFrontDrive.setPower(v2);
             leftBackDrive.setPower(v3);
             rightBackDrive.setPower(v4);
+            Slurper.setPower(SlurperPower);
+
+            if (gamepad1.dpad_left){
+                SlurperPower -= -1;
+            }
+            if (gamepad1.dpad_right) {
+                SlurperPower += .1;
+            }
+
+            if(gamepad1.right_trigger > 0){
+                Lift1.setPower(gamepad1.right_trigger);
+                Lift2.setPower(Lift1.getPower());
+            }else if(gamepad1.left_trigger > 0){
+                Lift1.setPower(-gamepad1.left_trigger);
+                Lift2.setPower(Lift1.getPower());
+            }else{
+                Lift1.setPower(0);
+                Lift2.setPower(Lift1.getPower());
+            }
 
 
 /**
@@ -178,11 +208,11 @@ public class FieldCentricDrive extends LinearOpMode {
             leftFrontDrive.setPower(backRightFrontLeftPwr);
             rightFrontDrive.setPower(backLeftFrontRightPwr);
 **/
-            if(angles.firstAngle > 0){
-                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-            }else{
-                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-            }
+//            if(angles.firstAngle > 0){
+//                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+//            }else{
+//                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+//            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
