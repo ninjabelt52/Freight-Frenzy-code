@@ -37,7 +37,9 @@ public class AutoAlignPipeline {
     public static int threshVal = 128;
 
 
+
     public AutoAlignPipeline(HardwareMap hardwareMap, String camName){
+
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class,  camName), cameraMonitorViewId);
@@ -61,7 +63,8 @@ public class AutoAlignPipeline {
             telemetry = "waiting for start";
     }
 
-    public class AutoDoubleCameras(String Camera1, String Camera2){
+    public static class AutoDoubleCameras{
+        HardwareMap hardwareMap = null;
         public static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
 
         private final String[] LABELS = {
@@ -75,14 +78,20 @@ public class AutoAlignPipeline {
 
         private VuforiaLocalizer vuforia;
 
-        private WebcamName webcam1, webcam2;
-        private SwitchableCamera switchableCamera;
-        private TFObjectDetector tfod;
+        public WebcamName webcam1, webcam2;
+        public SwitchableCamera switchableCamera;
+        public TFObjectDetector tfod;
 
         public void initVuforAndTF(){
             initVuforia();
             initTfod();
+
+            if (tfod != null) {
+                tfod.activate();
+                tfod.setZoom(1.0, 16.0/9.0);
+            }
         }
+
 
         private void initVuforia() {
             /*
@@ -123,7 +132,7 @@ public class AutoAlignPipeline {
             // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
         }
 
-        private void doCameraSwitching() {
+        public void doCameraSwitching() {
             // If the left bumper is pressed, use Webcam 1.
             // If the right bumper is pressed, use Webcam 2.
             if (true) {
