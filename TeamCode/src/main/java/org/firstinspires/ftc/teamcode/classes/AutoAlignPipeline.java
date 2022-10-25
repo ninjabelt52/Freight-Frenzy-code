@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode.classes;
 
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -21,9 +22,6 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.SwitchableCamera;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 
@@ -63,7 +61,7 @@ public class AutoAlignPipeline {
             telemetry = "waiting for start";
     }
 
-    /**public class AutoDoubleCameras(String Camera1, String Camera2){
+    public class AutoDoubleCameras(String Camera1, String Camera2){
         public static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
 
         private final String[] LABELS = {
@@ -81,12 +79,61 @@ public class AutoAlignPipeline {
         private SwitchableCamera switchableCamera;
         private TFObjectDetector tfod;
 
-        public void opMode(){
+        public void initVuforAndTF(){
             initVuforia();
             initTfod();
         }
+
+        private void initVuforia() {
+            /*
+             * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+             */
+            VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+            parameters.vuforiaLicenseKey = VUFORIA_KEY;
+
+            // Indicate that we wish to be able to switch cameras.
+            webcam1 = hardwareMap.get(WebcamName.class, "Webcam 1");
+            webcam2 = hardwareMap.get(WebcamName.class, "Webcam 2");
+            parameters.cameraName = ClassFactory.getInstance().getCameraManager().nameForSwitchableCamera(webcam1, webcam2);
+
+            //  Instantiate the Vuforia engine
+            vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+            // Set the active camera to Webcam 1.
+            switchableCamera = (SwitchableCamera) vuforia.getCamera();
+            switchableCamera.setActiveCamera(webcam1);
+        }
+
+        /**
+         * Initialize the TensorFlow Object Detection engine.
+         */
+        private void initTfod() {
+            int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                    "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+            tfodParameters.minResultConfidence = 0.75f;
+            tfodParameters.isModelTensorFlow2 = true;
+            tfodParameters.inputSize = 300;
+            tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+
+            // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
+            // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
+            tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+            // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+        }
+
+        private void doCameraSwitching() {
+            // If the left bumper is pressed, use Webcam 1.
+            // If the right bumper is pressed, use Webcam 2.
+            if (true) {
+                switchableCamera.setActiveCamera(webcam1);
+            } else if (false) {
+                switchableCamera.setActiveCamera(webcam2);
+            }
+        }
     }
-     **/
+
 
 
     class Threshold extends OpenCvPipeline {
