@@ -1,13 +1,15 @@
 
 package org.firstinspires.ftc.teamcode.classes;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.SwitchableCamera;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
@@ -18,11 +20,15 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.SwitchableCamera;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 @Config
 public class AutoAlignPipeline {
@@ -56,6 +62,32 @@ public class AutoAlignPipeline {
 
             telemetry = "waiting for start";
     }
+
+    /**public class AutoDoubleCameras(String Camera1, String Camera2){
+        public static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+
+        private final String[] LABELS = {
+                "1 Bolt",
+                "2 Bulb",
+                "3 Panel"
+        };
+
+        private static final String VUFORIA_KEY =
+                "ATIZ5+n/////AAABmYR5zYS7b0fUh3KW5QXpeYpWedz730exbiG/c1eUwnbTLDy3S1zpCnndqs2H1bBRoRji6zODId1wNciirjMhrl3kb2xpxrhjWKGzfymlE48qjK1tSK9ctbVPDDEI7d3wiO1vISMt8XRVM0HJFumWl7snC0XtMEyTqy7IxrPv858Bm2voggonrgAx+WT/LcXxfsUQjd7SpX1AhzOEzksBRKfws0MP5hw7hLLbB+4QSb03hTA90Mh/7F78NxFG8yYmPrM0GMVg+3TRjteX6TWOHidLSmrIzsZNGFeqXCHOx4QIWIiMOIenqgau/XX2zCqvrMGCpOTb77oTjkvOlLNh9WizYdFPQjT/u7CeU1p3Y1ox";
+
+        private VuforiaLocalizer vuforia;
+
+        private WebcamName webcam1, webcam2;
+        private SwitchableCamera switchableCamera;
+        private TFObjectDetector tfod;
+
+        public void opMode(){
+            initVuforia();
+            initTfod();
+        }
+    }
+     **/
+
 
     class Threshold extends OpenCvPipeline {
 
