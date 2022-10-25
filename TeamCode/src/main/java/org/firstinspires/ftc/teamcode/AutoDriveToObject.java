@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -40,8 +40,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  */
 
 @TeleOp(name="Drive To Target", group = "Concept")
-@Disabled
-public class ConceptVuforiaDriveToTargetWebcam extends LinearOpMode
+//@Disabled
+public class AutoDriveToObject extends LinearOpMode
 {
     // Adjust these numbers to suit your robot.
     final double DESIRED_DISTANCE = 8.0; //  this is how close the camera should get to the target (inches)
@@ -66,14 +66,16 @@ public class ConceptVuforiaDriveToTargetWebcam extends LinearOpMode
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            " --- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+            "ATIZ5+n/////AAABmYR5zYS7b0fUh3KW5QXpeYpWedz730exbiG/c1eUwnbTLDy3S1zpCnndqs2H1bBRoRji6zODId1wNciirjMhrl3kb2xpxrhjWKGzfymlE48qjK1tSK9ctbVPDDEI7d3wiO1vISMt8XRVM0HJFumWl7snC0XtMEyTqy7IxrPv858Bm2voggonrgAx+WT/LcXxfsUQjd7SpX1AhzOEzksBRKfws0MP5hw7hLLbB+4QSb03hTA90Mh/7F78NxFG8yYmPrM0GMVg+3TRjteX6TWOHidLSmrIzsZNGFeqXCHOx4QIWIiMOIenqgau/XX2zCqvrMGCpOTb77oTjkvOlLNh9WizYdFPQjT/u7CeU1p3Y1ox";
 
     VuforiaLocalizer vuforia    = null;
     OpenGLMatrix targetPose     = null;
     String targetName           = "";
 
-    private DcMotor leftDrive   = null;
-    private DcMotor rightDrive  = null;
+    private DcMotor leftBackDrive   = null;
+    private DcMotor leftFrontDrive  = null;
+    private DcMotor rightFrontDrive  = null;
+    private DcMotor rightBackDrive  = null;
 
     @Override public void runOpMode()
     {
@@ -108,14 +110,18 @@ public class ConceptVuforiaDriveToTargetWebcam extends LinearOpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
 
         telemetry.addData(">", "Press Play to start");
         telemetry.update();
@@ -194,8 +200,10 @@ public class ConceptVuforiaDriveToTargetWebcam extends LinearOpMode
             // Calculate left and right wheel powers and send to them to the motors.
             double leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             double rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-            leftDrive.setPower(leftPower);
-            rightDrive.setPower(rightPower);
+            leftBackDrive.setPower(leftPower);
+            rightBackDrive.setPower(rightPower);
+            leftFrontDrive.setPower(leftPower);
+            rightFrontDrive.setPower(rightPower);
 
             sleep(10);
         }
