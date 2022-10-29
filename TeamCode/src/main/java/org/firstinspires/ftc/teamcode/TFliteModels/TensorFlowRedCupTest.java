@@ -62,7 +62,7 @@ public class TensorFlowRedCupTest extends LinearOpMode {
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
     //private static final String TFOD_MODEL_ASSET = "/storage/emulated/0/FIRST/tflitemodels/RedCup.tflite";
-    private static final String TFOD_MODEL_ASSET = "/sdcard/RedCup.tflite";
+    private static final String TFOD_MODEL_ASSET = "/sdcard/FIRST/RedCup.tflite";
     //private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/RedCup.tflite";
 
 
