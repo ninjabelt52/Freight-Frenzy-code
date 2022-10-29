@@ -86,7 +86,7 @@ public class FieldCentricDrive extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        //RevBlinkinLedDriver blinkinLedDriver;
+        RevBlinkinLedDriver blinkinLedDriver;
         RevBlinkinLedDriver.BlinkinPattern pattern;
 
         //imu set up!
@@ -100,7 +100,7 @@ public class FieldCentricDrive extends LinearOpMode {
         CRServo Slurper;
 
 
-        //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
+        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
@@ -137,21 +137,9 @@ public class FieldCentricDrive extends LinearOpMode {
 
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-            // Setup a variable for each drive wheel to save power level for telemetry
             float heading = angles.firstAngle;
-            double leftBackPower;
-            double leftFrontPower;
-            double rightFrontPower;
-            double rightBackPower;
             double SlurperPower = 0.0;
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.right_stick_x;
-            double drift =  gamepad1.left_stick_x;
+            int fineTuneLift = 0;
 
             telemetry.addData("heading", heading);
 
@@ -188,6 +176,13 @@ public class FieldCentricDrive extends LinearOpMode {
                 Lift2.setPower(Lift1.getPower());
             }
 
+            if(/**gamepadDpadPressed**/false){
+                fineTuneLift = 0;
+                setHeight(1, Lift1, Lift2, fineTuneLift);
+            }
+            if(/**FineTune**/false){
+                setHeight(1, Lift1, Lift2, fineTuneLift);
+            }
 
 /**
             leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
@@ -208,16 +203,62 @@ public class FieldCentricDrive extends LinearOpMode {
             leftFrontDrive.setPower(backRightFrontLeftPwr);
             rightFrontDrive.setPower(backLeftFrontRightPwr);
 **/
-//            if(angles.firstAngle > 0){
-//                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-//            }else{
-//                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-//            }
+
+            lightTimer(runtime.seconds(), blinkinLedDriver);
+
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
         }
+    }
+    public void lightTimer(double runtime, RevBlinkinLedDriver Blinker){
+        double secLightSwitch = 0;
+        boolean lightPattern = false;
+        if(runtime > 85 && runtime < 90){
+            if(secLightSwitch <= 0){
+                secLightSwitch = 90 - runtime;
+                if (lightPattern == true){
+                    Blinker.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+                    lightPattern = false;
+                }else{
+                    Blinker.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+                    lightPattern = true;
+                }
+            }
+            else if(90 - runtime != secLightSwitch){
+                secLightSwitch --;
+            }
+        }if(runtime >= 90){
+            Blinker.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+        }
+    }
+    public void setHeight(double height, DcMotor lift1, DcMotor lift2, int fineTune){
+        int targetPos = 0;
+        if(height == 1){
+            targetPos = 1 + fineTune;
+        }else if(height == 2){
+            targetPos = 200 + fineTune;
+        }else if(height == 3){
+            targetPos = 300 + fineTune;
+        }else if(height == 4){
+            targetPos = 400 + fineTune;
+        }
+        lift1.setTargetPosition(targetPos);
+        lift2.setTargetPosition(targetPos);
+        lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift1.setPower(0.4);
+        lift2.setPower(0.4);
+    }
+    public void turnOffLift(DcMotor lift1, DcMotor lift2){
+        lift1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift1.setPower(0);
+        lift2.setPower(0);
     }
 }
