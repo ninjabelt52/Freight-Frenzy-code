@@ -62,8 +62,8 @@ public class TensorFlowRedCupTest extends LinearOpMode {
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
     //private static final String TFOD_MODEL_ASSET = "/storage/emulated/0/FIRST/tflitemodels/RedCup.tflite";
-    //private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/RedCup.tflite";
+    private static final String TFOD_MODEL_ASSET = "/sdcard/RedCup.tflite";
+    //private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/RedCup.tflite";
 
 
     private static final String[] LABELS = {
@@ -184,7 +184,7 @@ public class TensorFlowRedCupTest extends LinearOpMode {
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        //tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        //tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 }
