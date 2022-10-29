@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.teleOp;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -52,26 +52,9 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 import java.util.Locale;
 
-
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When a selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
-
-@TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-//@Disabled
+@TeleOp(name="TeleOp", group="TeleOp")
 public class FieldCentricDrive extends LinearOpMode {
 
-    // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftBackDrive = null;
     private DcMotor leftFrontDrive = null;
     private DcMotor rightBackDrive = null;
@@ -98,6 +81,7 @@ public class FieldCentricDrive extends LinearOpMode {
         DcMotor Lift1;
         DcMotor Lift2;
         CRServo Slurper;
+        DcMotor arm;
 
 
         //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -106,57 +90,43 @@ public class FieldCentricDrive extends LinearOpMode {
 
         angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        rightFrontDrive  = hardwareMap.get(DcMotor.class, "right_front_drive");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "bl");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "fl");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "br");
+        rightFrontDrive  = hardwareMap.get(DcMotor.class, "fr");
 
         Lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         Lift2 = hardwareMap.get(DcMotor.class, "Lift2");
         Slurper = hardwareMap.get(CRServo.class, "Slurper");
+        arm = hardwareMap.get(DcMotor.class, "arm");
 
-
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        Lift1.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Wait for the game to start (driver presses PLAY)
+        Lift1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Lift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         waitForStart();
-        runtime.reset();
 
-        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-            // Setup a variable for each drive wheel to save power level for telemetry
             float heading = angles.firstAngle;
-            double leftBackPower;
-            double leftFrontPower;
-            double rightFrontPower;
-            double rightBackPower;
             double SlurperPower = 0.0;
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.right_stick_x;
-            double drift =  gamepad1.left_stick_x;
 
             telemetry.addData("heading", heading);
 
-            double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
+            double r = Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+            double robotAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
             double rightX = gamepad1.right_stick_x;
             double radientsHeding = angles.firstAngle * Math.PI/180;
             final double v1 = r * Math.cos(robotAngle - radientsHeding) + rightX;
@@ -168,13 +138,13 @@ public class FieldCentricDrive extends LinearOpMode {
             rightFrontDrive.setPower(v2);
             leftBackDrive.setPower(v3);
             rightBackDrive.setPower(v4);
-            Slurper.setPower(SlurperPower);
 
-            if (gamepad1.dpad_left){
-                SlurperPower -= -1;
-            }
-            if (gamepad1.dpad_right) {
-                SlurperPower += .1;
+            if(gamepad1.y){
+                Slurper.setPower(1);
+            }else if(gamepad1.a){
+                Slurper.setPower(-1);
+            }else if(gamepad1.b){
+                Slurper.setPower(0);
             }
 
             if(gamepad1.right_trigger > 0){
@@ -188,35 +158,20 @@ public class FieldCentricDrive extends LinearOpMode {
                 Lift2.setPower(Lift1.getPower());
             }
 
+            if(gamepad1.dpad_up){
+                arm.setPower(1);
+            }else if(gamepad1.dpad_down){
+                arm.setPower(-1);
+            }else{
+                arm.setPower(0);
+            }
 
-/**
-            leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightBackPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-            leftFrontPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightFrontPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-
-            double backLeftFrontRightPwr = -(Math.sqrt(turn*turn+drive*drive))*(Math.sin(heading)-Math.cos(heading));
-            double backRightFrontLeftPwr = (Math.sqrt(turn*turn + drive*drive))*(Math.sin(heading)+ Math.cos(heading));
-
-            leftBackDrive.setPower(backLeftFrontRightPwr);
-            rightBackDrive.setPower(backRightFrontLeftPwr);
-            leftFrontDrive.setPower(backRightFrontLeftPwr);
-            rightFrontDrive.setPower(backLeftFrontRightPwr);
-**/
 //            if(angles.firstAngle > 0){
 //                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
 //            }else{
 //                blinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
 //            }
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             telemetry.update();
         }
     }
