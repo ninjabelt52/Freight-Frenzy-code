@@ -264,4 +264,14 @@ public class FieldCentricDrive extends LinearOpMode {
         lift1.setPower(0);
         lift2.setPower(0);
     }
+    public void sluperArm(int Pos, DcMotor slurper){
+        slurper.setTargetPosition(Pos * 1316);
+        slurper.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slurper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slurper.setPower(0.4);
+    }
+    public void onOffSwitchSlurper(DcMotor slurper){
+        slurper.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slurper.setPower(0);
+    }
 }
