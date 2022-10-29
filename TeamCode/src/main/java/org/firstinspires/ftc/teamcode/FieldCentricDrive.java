@@ -183,6 +183,9 @@ public class FieldCentricDrive extends LinearOpMode {
             if(/**FineTune**/false){
                 setHeight(1, Lift1, Lift2, fineTuneLift);
             }
+            if(/**FineTune**/false){
+                setHeight(1, Lift1, Lift2, fineTuneLift);
+            }
 
 /**
             leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
