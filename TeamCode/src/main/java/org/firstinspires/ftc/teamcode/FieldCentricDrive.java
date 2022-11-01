@@ -98,6 +98,7 @@ public class FieldCentricDrive extends LinearOpMode {
         DcMotor Lift1;
         DcMotor Lift2;
         CRServo Slurper;
+        LiftnArm lift = new LiftnArm(hardwareMap, gamepad1, gamepad2);
 
 
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -168,46 +169,26 @@ public class FieldCentricDrive extends LinearOpMode {
 
             if(gamepad1.left_trigger > 0.2 && gamepad1.y){
                 fineTuneLift = 0;
-                setHeight(4, Lift1, Lift2, fineTuneLift);
+                lift.setHeight(4, fineTuneLift);
             }else if(gamepad1.left_trigger > 0.2 && gamepad1.x){
                 fineTuneLift = 0;
-                setHeight(3, Lift1, Lift2, fineTuneLift);
+                lift.setHeight(3, fineTuneLift);
             }else if(gamepad1.left_trigger > 0.2 && gamepad1.b){
                 fineTuneLift = 0;
-                setHeight(2, Lift1, Lift2, fineTuneLift);
+                lift.setHeight(2, fineTuneLift);
             }else if(gamepad1.left_trigger > 0.2 && gamepad1.a){
                 fineTuneLift = 0;
-                setHeight(1, Lift1, Lift2, fineTuneLift);
+                lift.setHeight(1, fineTuneLift);
             }
 
             if(gamepad2.right_bumper){
                 fineTuneLift ++;
-                setHeight(5, Lift1, Lift2, fineTuneLift);
+                lift.setHeight(5, fineTuneLift);
             }else if(gamepad2.left_bumper){
                 fineTuneLift --;
-                setHeight(5, Lift1, Lift2, fineTuneLift);
+                lift.setHeight(5, fineTuneLift);
             }
 
-
-/**
-            leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightBackPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-            leftFrontPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightFrontPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-
-            double backLeftFrontRightPwr = -(Math.sqrt(turn*turn+drive*drive))*(Math.sin(heading)-Math.cos(heading));
-            double backRightFrontLeftPwr = (Math.sqrt(turn*turn + drive*drive))*(Math.sin(heading)+ Math.cos(heading));
-
-            leftBackDrive.setPower(backLeftFrontRightPwr);
-            rightBackDrive.setPower(backRightFrontLeftPwr);
-            leftFrontDrive.setPower(backRightFrontLeftPwr);
-            rightFrontDrive.setPower(backLeftFrontRightPwr);
-**/
 
             lightTimer(runtime.seconds(), blinkinLedDriver);
 
@@ -240,40 +221,14 @@ public class FieldCentricDrive extends LinearOpMode {
             Blinker.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
         }
     }
-    public void setHeight(double height, DcMotor lift1, DcMotor lift2, int fineTune){
-        int targetPos = 0;
-        if(height == 1){
-            targetPos = 1;
-        }else if(height == 2){
-            targetPos = 200;
-        }else if(height == 3){
-            targetPos = 300;
-        }else if(height == 4){
-            targetPos = 400;
-        }
-        targetPos = targetPos + fineTune;
 
-        lift1.setTargetPosition(targetPos);
-        lift2.setTargetPosition(targetPos);
-        lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        lift1.setPower(0.4);
-        lift2.setPower(0.4);
-    }
     public void turnOffLift(DcMotor lift1, DcMotor lift2){
         lift1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift1.setPower(0);
         lift2.setPower(0);
     }
-    public void sluperArm(int Pos, DcMotor slurper){
-        slurper.setTargetPosition(Pos * 1316);
-        slurper.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        slurper.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slurper.setPower(0.4);
-    }
+
     public void onOffSwitchSlurper(DcMotor slurper){
         slurper.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slurper.setPower(0);
