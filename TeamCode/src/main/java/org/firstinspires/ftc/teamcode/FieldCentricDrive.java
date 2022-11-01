@@ -101,6 +101,9 @@ public class FieldCentricDrive extends LinearOpMode {
 
         boolean toggle = true;
         boolean toggle2 = true;
+        boolean toggle3 = true;
+
+        boolean liftOnOff = false;
 
 
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -169,16 +172,16 @@ public class FieldCentricDrive extends LinearOpMode {
             }
 
 
-            if(gamepad1.left_trigger > 0.2 && gamepad1.y){
+            if(gamepad2.left_trigger > 0.2 && gamepad2.y && liftOnOff == true){
                 fineTuneLift = 0;
-                setHeight(4, Lift1, Lift2, fineTuneLift);
-            }else if(gamepad1.left_trigger > 0.2 && gamepad1.x){
+                setHeight(4, Lift1, Lift2, fineTuneLift );
+            }else if(gamepad2.left_trigger > 0.2 && gamepad2.x && liftOnOff == true){
                 fineTuneLift = 0;
                 setHeight(3, Lift1, Lift2, fineTuneLift);
-            }else if(gamepad1.left_trigger > 0.2 && gamepad1.b){
+            }else if(gamepad2.left_trigger > 0.2 && gamepad2.b && liftOnOff == true){
                 fineTuneLift = 0;
                 setHeight(2, Lift1, Lift2, fineTuneLift);
-            }else if(gamepad1.left_trigger > 0.2 && gamepad1.a){
+            }else if(gamepad2.left_trigger > 0.2 && gamepad2.a && liftOnOff == true){
                 fineTuneLift = 0;
                 setHeight(1, Lift1, Lift2, fineTuneLift);
             }
@@ -201,27 +204,20 @@ public class FieldCentricDrive extends LinearOpMode {
             }else{
                 toggle2 = true;
             }
+            if(gamepad1.a){
+                if(toggle3){
+                    if(liftOnOff == true){
+                        liftOnOff = false;
+                        turnOffLift(Lift1, Lift2);
+                    }else{
+                        liftOnOff = true;
+                    }
+                    toggle3 = false;
+                }
+            }else{
+                toggle3 = true;
+            }
 
-
-/**
-            leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightBackPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-            leftFrontPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightFrontPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-
-            double backLeftFrontRightPwr = -(Math.sqrt(turn*turn+drive*drive))*(Math.sin(heading)-Math.cos(heading));
-            double backRightFrontLeftPwr = (Math.sqrt(turn*turn + drive*drive))*(Math.sin(heading)+ Math.cos(heading));
-
-            leftBackDrive.setPower(backLeftFrontRightPwr);
-            rightBackDrive.setPower(backRightFrontLeftPwr);
-            leftFrontDrive.setPower(backRightFrontLeftPwr);
-            rightFrontDrive.setPower(backLeftFrontRightPwr);
-**/
 
             lightTimer(runtime.seconds(), blinkinLedDriver);
 
@@ -255,20 +251,25 @@ public class FieldCentricDrive extends LinearOpMode {
         }
     }
     public void setHeight(double height, DcMotor lift1, DcMotor lift2, int fineTune){
-        int targetPos = 0;
-        if(height == 1){
-            targetPos = 1;
-        }else if(height == 2){
-            targetPos = 200;
-        }else if(height == 3){
-            targetPos = 300;
-        }else if(height == 4){
-            targetPos = 400;
-        }
-        targetPos = targetPos + fineTune;
 
-        lift1.setTargetPosition(targetPos);
-        lift2.setTargetPosition(targetPos);
+        if (height == 1 ||height == 2 ||height == 3 ||height == 4) {
+            int targetPos = 0;
+            if (height == 1) {
+                targetPos = 1;
+            } else if (height == 2) {
+                targetPos = 200;
+            } else if (height == 3) {
+                targetPos = 300;
+            } else if (height == 4) {
+                targetPos = 400;
+            }
+            lift1.setTargetPosition(targetPos);
+            lift2.setTargetPosition(targetPos);
+        }else{
+            lift1.setTargetPosition(lift1.getCurrentPosition() + fineTune);
+            lift2.setTargetPosition(lift2.getCurrentPosition() + fineTune);
+        }
+
         lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
