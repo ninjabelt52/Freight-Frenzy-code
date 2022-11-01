@@ -52,10 +52,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //@Disabled
 public class MotorEncoderTestsManual extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor lift1 = null;
-    private DcMotor lift2 = null;
-    private int liftTarget = 0;
+    ElapsedTime runtime = new ElapsedTime();
+    DcMotor lift1 = null;
+    DcMotor lift2 = null;
+    int liftTarget = 0;
 
     @Override
     public void runOpMode() {
@@ -88,7 +88,7 @@ public class MotorEncoderTestsManual extends LinearOpMode {
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("liftEncoder", "lift1 (%.2f), lift2 (%.2f)", lift1.getCurrentPosition(), lift2.getCurrentPosition());
+            telemetry.addData("liftEncoder", "lift1, lift2", lift1.getCurrentPosition(), lift2.getCurrentPosition());
             telemetry.update();
         }
     }
