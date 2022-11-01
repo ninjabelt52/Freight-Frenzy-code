@@ -142,6 +142,9 @@ public class FieldCentricDrive extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        Lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
