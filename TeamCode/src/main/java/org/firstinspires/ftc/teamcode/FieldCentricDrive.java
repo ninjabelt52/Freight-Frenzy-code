@@ -106,7 +106,7 @@ public class FieldCentricDrive extends LinearOpMode {
         boolean liftOnOff = false;
 
 
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
+        //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
@@ -116,10 +116,10 @@ public class FieldCentricDrive extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
-        rightFrontDrive  = hardwareMap.get(DcMotor.class, "rf");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "bl");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "fl");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "br");
+        rightFrontDrive  = hardwareMap.get(DcMotor.class, "fr");
 
         Lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         Lift2 = hardwareMap.get(DcMotor.class, "Lift2");
@@ -206,9 +206,11 @@ public class FieldCentricDrive extends LinearOpMode {
             }else{
                 toggle2 = true;
             }
+
+
             if(gamepad1.a){
                 if(toggle3){
-                    if(liftOnOff == true){
+                    if(liftOnOff){
                         liftOnOff = false;
                         turnOffLift(Lift1, Lift2);
                     }else{
@@ -221,7 +223,7 @@ public class FieldCentricDrive extends LinearOpMode {
             }
 
 
-            lightTimer(runtime.seconds(), blinkinLedDriver);
+            //lightTimer(runtime.seconds(), blinkinLedDriver);
 
 
 
