@@ -99,6 +99,9 @@ public class FieldCentricDrive extends LinearOpMode {
         DcMotor Lift2;
         CRServo Slurper;
 
+        boolean toggle = true;
+        boolean toggle2 = true;
+
 
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -181,11 +184,22 @@ public class FieldCentricDrive extends LinearOpMode {
             }
 
             if(gamepad2.right_bumper){
-                fineTuneLift ++;
-                setHeight(5, Lift1, Lift2, fineTuneLift);
-            }else if(gamepad2.left_bumper){
-                fineTuneLift --;
-                setHeight(5, Lift1, Lift2, fineTuneLift);
+                if(toggle){
+                    fineTuneLift += 219;
+                    setHeight(5, Lift1, Lift2, fineTuneLift);
+                    toggle = false;
+                }
+            }else{
+                toggle = true;
+            }
+            if(gamepad2.left_bumper){
+                if(toggle2){
+                    fineTuneLift -= 219;
+                    setHeight(5, Lift1, Lift2, fineTuneLift);
+                    toggle2 = false;
+                }
+            }else{
+                toggle2 = true;
             }
 
 
