@@ -85,12 +85,25 @@ public class MotorEncoderTests extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            if (gamepad1.a){
+                liftTarget ++;
+            }else if (gamepad1.b){
+                liftTarget --;
+            }
+
+
             lift1.setTargetPosition(liftTarget);
+            lift2.setTargetPosition(liftTarget);
             lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("liftEncoder", "lift1 (%.2f), lift2 (%.2f)", lift1.getCurrentPosition(), lift2.getCurrentPosition());
+            telemetry.addData("Lift Target Pos", liftTarget);
             telemetry.update();
         }
     }
