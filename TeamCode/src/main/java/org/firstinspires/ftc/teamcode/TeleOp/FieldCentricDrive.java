@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -98,6 +98,7 @@ public class FieldCentricDrive extends LinearOpMode {
         DcMotor Lift1;
         DcMotor Lift2;
         CRServo Slurper;
+        int height = 0;
 
 
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -166,26 +167,28 @@ public class FieldCentricDrive extends LinearOpMode {
             }
 
             if(gamepad1.right_trigger > 0){
-                Lift1.setPower(gamepad1.right_trigger);
-                Lift2.setPower(Lift1.getPower());
+                height++;
             }else if(gamepad1.left_trigger > 0){
-                Lift1.setPower(-gamepad1.left_trigger);
-                Lift2.setPower(Lift1.getPower());
-            }else{
-                Lift1.setPower(0);
-                Lift2.setPower(Lift1.getPower());
+                height--;
             }
 
-            if(/**gamepadDpadPressed**/false){
-                fineTuneLift = 0;
-                setHeight(1, Lift1, Lift2, fineTuneLift);
-            }
-            if(/**FineTune**/false){
-                setHeight(1, Lift1, Lift2, fineTuneLift);
-            }
-            if(/**FineTune**/false){
-                setHeight(1, Lift1, Lift2, fineTuneLift);
-            }
+            Lift1.setTargetPosition(height);
+            Lift2.setTargetPosition(Lift1.getTargetPosition());
+            Lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Lift2.setMode(Lift1.getMode());
+            Lift1.setPower(.5);
+            Lift2.setPower(Lift1.getPower());
+
+//            if(/**gamepadDpadPressed**/false){
+//                fineTuneLift = 0;
+//                setHeight(1, Lift1, Lift2, fineTuneLift);
+//            }
+//            if(/**FineTune**/false){
+//                setHeight(1, Lift1, Lift2, fineTuneLift);
+//            }
+//            if(/**FineTune**/false){
+//                setHeight(1, Lift1, Lift2, fineTuneLift);
+//            }
 
 /**
             leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
