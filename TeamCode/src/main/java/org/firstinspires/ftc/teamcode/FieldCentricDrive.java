@@ -165,27 +165,29 @@ public class FieldCentricDrive extends LinearOpMode {
                 SlurperPower += .1;
             }
 
-            if(gamepad1.right_trigger > 0){
-                Lift1.setPower(gamepad1.right_trigger);
-                Lift2.setPower(Lift1.getPower());
-            }else if(gamepad1.left_trigger > 0){
-                Lift1.setPower(-gamepad1.left_trigger);
-                Lift2.setPower(Lift1.getPower());
-            }else{
-                Lift1.setPower(0);
-                Lift2.setPower(Lift1.getPower());
-            }
 
-            if(/**gamepadDpadPressed**/false){
+            if(gamepad1.left_trigger > 0.2 && gamepad1.y){
+                fineTuneLift = 0;
+                setHeight(4, Lift1, Lift2, fineTuneLift);
+            }else if(gamepad1.left_trigger > 0.2 && gamepad1.x){
+                fineTuneLift = 0;
+                setHeight(3, Lift1, Lift2, fineTuneLift);
+            }else if(gamepad1.left_trigger > 0.2 && gamepad1.b){
+                fineTuneLift = 0;
+                setHeight(2, Lift1, Lift2, fineTuneLift);
+            }else if(gamepad1.left_trigger > 0.2 && gamepad1.a){
                 fineTuneLift = 0;
                 setHeight(1, Lift1, Lift2, fineTuneLift);
             }
-            if(/**FineTune**/false){
-                setHeight(1, Lift1, Lift2, fineTuneLift);
+
+            if(gamepad2.right_bumper){
+                fineTuneLift ++;
+                setHeight(5, Lift1, Lift2, fineTuneLift);
+            }else if(gamepad2.left_bumper){
+                fineTuneLift --;
+                setHeight(5, Lift1, Lift2, fineTuneLift);
             }
-            if(/**FineTune**/false){
-                setHeight(1, Lift1, Lift2, fineTuneLift);
-            }
+
 
 /**
             leftBackPower    = Range.clip(drive + turn, -1.0, 1.0) ;
@@ -241,14 +243,16 @@ public class FieldCentricDrive extends LinearOpMode {
     public void setHeight(double height, DcMotor lift1, DcMotor lift2, int fineTune){
         int targetPos = 0;
         if(height == 1){
-            targetPos = 1 + fineTune;
+            targetPos = 1;
         }else if(height == 2){
-            targetPos = 200 + fineTune;
+            targetPos = 200;
         }else if(height == 3){
-            targetPos = 300 + fineTune;
+            targetPos = 300;
         }else if(height == 4){
-            targetPos = 400 + fineTune;
+            targetPos = 400;
         }
+        targetPos = targetPos + fineTune;
+
         lift1.setTargetPosition(targetPos);
         lift2.setTargetPosition(targetPos);
         lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
