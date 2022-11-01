@@ -75,6 +75,9 @@ public class MotorEncoderTestsManual extends LinearOpMode {
         lift1.setDirection(DcMotor.Direction.FORWARD);
         lift2.setDirection(DcMotor.Direction.REVERSE);
 
+        lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -86,9 +89,8 @@ public class MotorEncoderTestsManual extends LinearOpMode {
             lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("liftEncoder", "lift1, lift2", lift1.getCurrentPosition(), lift2.getCurrentPosition());
+            telemetry.addData("lift1", lift1.getCurrentPosition());
+            telemetry.addData("lift2", lift2.getCurrentPosition());
             telemetry.update();
         }
     }
