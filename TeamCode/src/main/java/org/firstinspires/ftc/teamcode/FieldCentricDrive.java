@@ -281,9 +281,13 @@ public class FieldCentricDrive extends LinearOpMode {
             }
             lift1.setTargetPosition(targetPos);
         }else{
-            lift1.setTargetPosition(lift1.getCurrentPosition() + fineTune);
+            if(lift1.getCurrentPosition() + fineTune > 0 && lift1.getCurrentPosition() + fineTune < 1300) {
+                lift1.setTargetPosition(lift1.getCurrentPosition() + fineTune);
+            }
         }
         lift2.setTargetPosition(lift1.getCurrentPosition());
+
+
 
         lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
