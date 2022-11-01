@@ -29,13 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -51,9 +48,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="MotorEncoderSet", group="Linear Opmode")
+@TeleOp(name="ControllerMotorEncoderSet", group="Linear Opmode")
 //@Disabled
-public class MotorEncoderTests extends LinearOpMode {
+public class MotorEncoderTestsController extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor lift1 = null;
@@ -98,6 +95,8 @@ public class MotorEncoderTests extends LinearOpMode {
             lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift1.setPower(0.6);
+            lift2.setPower(0.6);
 
 
             // Show the elapsed game time and wheel power.
