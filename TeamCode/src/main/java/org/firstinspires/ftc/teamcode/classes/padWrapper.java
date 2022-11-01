@@ -26,7 +26,6 @@ public class padWrapper {
         return num;
     }
 
-    public int incDown ()
 
     public enum button {
         A,
