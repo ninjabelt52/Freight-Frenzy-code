@@ -116,10 +116,10 @@ public class FieldCentricDrive extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        rightFrontDrive  = hardwareMap.get(DcMotor.class, "right_front_drive");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "lb");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "lf");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rb");
+        rightFrontDrive  = hardwareMap.get(DcMotor.class, "rf");
 
         Lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         Lift2 = hardwareMap.get(DcMotor.class, "Lift2");
@@ -133,6 +133,8 @@ public class FieldCentricDrive extends LinearOpMode {
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        Lift2.setDirection(DcMotorSimple.Direction.FORWARD);
+        Lift1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -257,11 +259,11 @@ public class FieldCentricDrive extends LinearOpMode {
             if (height == 1) {
                 targetPos = 1;
             } else if (height == 2) {
-                targetPos = 200;
+                targetPos = 250;
             } else if (height == 3) {
-                targetPos = 300;
+                targetPos = 700;
             } else if (height == 4) {
-                targetPos = 400;
+                targetPos = 1200;
             }
             lift1.setTargetPosition(targetPos);
             lift2.setTargetPosition(targetPos);
@@ -294,3 +296,4 @@ public class FieldCentricDrive extends LinearOpMode {
         slurper.setPower(0);
     }
 }
+//250, 700, 1200
