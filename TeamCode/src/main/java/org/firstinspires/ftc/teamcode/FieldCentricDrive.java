@@ -103,6 +103,9 @@ public class FieldCentricDrive extends LinearOpMode {
         boolean toggle2 = true;
         boolean toggle3 = true;
 
+        boolean isLiftUp = false;
+        int robotPresetHeight = 1;
+
 
 
         //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -175,16 +178,16 @@ public class FieldCentricDrive extends LinearOpMode {
 
             if(gamepad2.left_trigger > 0.2 && gamepad2.y){
                 fineTuneLift = 0;
-                setHeight(4, Lift1, Lift2, fineTuneLift );
+                robotPresetHeight = 4;
             }else if(gamepad2.left_trigger > 0.2 && gamepad2.x){
                 fineTuneLift = 0;
-                setHeight(3, Lift1, Lift2, fineTuneLift);
+                robotPresetHeight = 3;
             }else if(gamepad2.left_trigger > 0.2 && gamepad2.b){
                 fineTuneLift = 0;
-                setHeight(2, Lift1, Lift2, fineTuneLift);
+                robotPresetHeight = 2;
             }else if(gamepad2.left_trigger > 0.2 && gamepad2.a){
                 fineTuneLift = 0;
-                setHeight(1, Lift1, Lift2, fineTuneLift);
+                robotPresetHeight = 1;
             }
 
             if(gamepad2.right_bumper){
@@ -207,8 +210,13 @@ public class FieldCentricDrive extends LinearOpMode {
             }
             if(gamepad1.a){
                 if(toggle3){
-                    setHeight(1, Lift1, Lift2, fineTuneLift);
-                    toggle3 = false;
+                    if(isLiftUp) {
+                        turnOffLift(Lift1,Lift2);
+                        toggle3 = false;
+                    }else{
+                        setHeight(robotPresetHeight, Lift1, Lift2, fineTuneLift);
+                        toggle3 = false;
+                    }
                 }
             }else{
                 toggle3 = true;
