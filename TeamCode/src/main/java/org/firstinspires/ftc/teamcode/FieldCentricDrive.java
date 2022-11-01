@@ -86,8 +86,8 @@ public class FieldCentricDrive extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        RevBlinkinLedDriver blinkinLedDriver;
-        RevBlinkinLedDriver.BlinkinPattern pattern;
+        //RevBlinkinLedDriver blinkinLedDriver;
+        //RevBlinkinLedDriver.BlinkinPattern pattern;
 
         //imu set up!
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -103,7 +103,6 @@ public class FieldCentricDrive extends LinearOpMode {
         boolean toggle2 = true;
         boolean toggle3 = true;
 
-        boolean liftOnOff = false;
 
 
         //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -174,16 +173,16 @@ public class FieldCentricDrive extends LinearOpMode {
             }
 
 
-            if(gamepad2.left_trigger > 0.2 && gamepad2.y && liftOnOff == true){
+            if(gamepad2.left_trigger > 0.2 && gamepad2.y){
                 fineTuneLift = 0;
                 setHeight(4, Lift1, Lift2, fineTuneLift );
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.x && liftOnOff == true){
+            }else if(gamepad2.left_trigger > 0.2 && gamepad2.x){
                 fineTuneLift = 0;
                 setHeight(3, Lift1, Lift2, fineTuneLift);
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.b && liftOnOff == true){
+            }else if(gamepad2.left_trigger > 0.2 && gamepad2.b){
                 fineTuneLift = 0;
                 setHeight(2, Lift1, Lift2, fineTuneLift);
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.a && liftOnOff == true){
+            }else if(gamepad2.left_trigger > 0.2 && gamepad2.a){
                 fineTuneLift = 0;
                 setHeight(1, Lift1, Lift2, fineTuneLift);
             }
@@ -206,16 +205,9 @@ public class FieldCentricDrive extends LinearOpMode {
             }else{
                 toggle2 = true;
             }
-
-
             if(gamepad1.a){
                 if(toggle3){
-                    if(liftOnOff){
-                        liftOnOff = false;
-                        turnOffLift(Lift1, Lift2);
-                    }else{
-                        liftOnOff = true;
-                    }
+                    setHeight(1, Lift1, Lift2, fineTuneLift);
                     toggle3 = false;
                 }
             }else{
