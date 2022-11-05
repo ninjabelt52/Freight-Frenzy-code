@@ -180,29 +180,19 @@ public class FieldCentricDrive extends LinearOpMode {
 
 
             if(gamepad2.left_trigger > 0.2 && gamepad2.y){
-                fineTuneLift = 0;
                 robotPresetHeight = 4;
-                if(isLiftUp){
-                    setHeight(4, Lift1, Lift2, fineTuneLift);
-                }
             }else if(gamepad2.left_trigger > 0.2 && gamepad2.x){
-                fineTuneLift = 0;
                 robotPresetHeight = 3;
-                if(isLiftUp){
-                    setHeight(3, Lift1, Lift2, fineTuneLift);
-                }
             }else if(gamepad2.left_trigger > 0.2 && gamepad2.b){
-                fineTuneLift = 0;
                 robotPresetHeight = 2;
-                if(isLiftUp){
-                    setHeight(2, Lift1, Lift2, fineTuneLift);
-                }
             }else if(gamepad2.left_trigger > 0.2 && gamepad2.a){
-                fineTuneLift = 0;
                 robotPresetHeight = 1;
-                if(isLiftUp){
-                    setHeight(1, Lift1, Lift2, fineTuneLift);
-                }
+            }
+
+            if(isLiftUp){
+                setHeight(robotPresetHeight, Lift1, Lift2, fineTuneLift);
+            }else{
+                setHeight(0, Lift1, Lift2, fineTuneLift);
             }
 
             if(gamepad2.right_bumper){
@@ -225,13 +215,7 @@ public class FieldCentricDrive extends LinearOpMode {
             }
             if(gamepad1.a){
                 if(toggle3){
-                    if(isLiftUp) {
-                        turnOffLift(Lift1,Lift2);
-                        toggle3 = false;
-                    }else{
-                        setHeight(robotPresetHeight, Lift1, Lift2, fineTuneLift);
-                        toggle3 = false;
-                    }
+                    isLiftUp = !isLiftUp;
                 }
             }else{
                 toggle3 = true;
