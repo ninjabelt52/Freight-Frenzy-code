@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -55,7 +56,7 @@ public class MotorEncoderTestsManual extends LinearOpMode {
     ElapsedTime runtime = new ElapsedTime();
     DcMotor lift1 = null;
     DcMotor lift2 = null;
-    int liftTarget = 0;
+    TouchSensor liftStop;
 
     @Override
     public void runOpMode() {
@@ -68,6 +69,7 @@ public class MotorEncoderTestsManual extends LinearOpMode {
 
         lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         lift2 = hardwareMap.get(DcMotor.class, "Lift2");
+        liftStop = hardwareMap.get(TouchSensor.class, "Lift");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -91,6 +93,7 @@ public class MotorEncoderTestsManual extends LinearOpMode {
 
             telemetry.addData("lift1", lift1.getCurrentPosition());
             telemetry.addData("lift2", lift2.getCurrentPosition());
+            telemetry.addData("liftLimit", liftStop.isPressed());
             telemetry.update();
         }
     }

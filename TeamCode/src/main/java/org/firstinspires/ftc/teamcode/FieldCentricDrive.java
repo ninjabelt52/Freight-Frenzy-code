@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -77,6 +78,8 @@ public class FieldCentricDrive extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor rightFrontDrive = null;
 
+    double bottom = 0;
+
     BNO055IMU imu;
 
     Orientation angles;
@@ -97,7 +100,9 @@ public class FieldCentricDrive extends LinearOpMode {
         parameters.loggingTag          = "IMU";
         DcMotor Lift1;
         DcMotor Lift2;
+        DcMotor arm;
         CRServo Slurper;
+        TouchSensor Lift, armStop;
 
         boolean toggle = true;
         boolean toggle2 = true;
@@ -105,6 +110,8 @@ public class FieldCentricDrive extends LinearOpMode {
 
         boolean isLiftUp = false;
         int robotPresetHeight = 1;
+
+        int height = 0;
 
 
 
@@ -122,6 +129,11 @@ public class FieldCentricDrive extends LinearOpMode {
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "fl");
         rightBackDrive = hardwareMap.get(DcMotor.class, "br");
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "fr");
+        arm = hardwareMap.get(DcMotor.class, "arm");
+
+        Lift = hardwareMap.get(TouchSensor.class, "Lift");
+        armStop = hardwareMap.get(TouchSensor.class, "armStop");
+        //armStop = hardwareMap.get(TouchSensor.class, "armStop");
 
         Lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         Lift2 = hardwareMap.get(DcMotor.class, "Lift2");
@@ -138,6 +150,13 @@ public class FieldCentricDrive extends LinearOpMode {
         Lift2.setDirection(DcMotorSimple.Direction.FORWARD);
         Lift1.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        Lift1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Lift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -153,8 +172,8 @@ public class FieldCentricDrive extends LinearOpMode {
 
             telemetry.addData("heading", heading);
 
-            double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
+            double r = Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+            double robotAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
             double rightX = gamepad1.right_stick_x;
             double radientsHeding = angles.firstAngle * Math.PI/180;
             final double v1 = r * Math.cos(robotAngle - radientsHeding) + rightX;
@@ -166,82 +185,55 @@ public class FieldCentricDrive extends LinearOpMode {
             rightFrontDrive.setPower(v2);
             leftBackDrive.setPower(v3);
             rightBackDrive.setPower(v4);
-            Slurper.setPower(SlurperPower);
 
-            if (gamepad1.dpad_left){
-                SlurperPower -= -1;
-            }
-            if (gamepad1.dpad_right) {
-                SlurperPower += .1;
-            }
-
-
-            if(gamepad2.left_trigger > 0.2 && gamepad2.y){
-                fineTuneLift = 0;
-                robotPresetHeight = 4;
-                if(isLiftUp){
-                    setHeight(4, Lift1, Lift2, fineTuneLift);
-                }
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.x){
-                fineTuneLift = 0;
-                robotPresetHeight = 3;
-                if(isLiftUp){
-                    setHeight(3, Lift1, Lift2, fineTuneLift);
-                }
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.b){
-                fineTuneLift = 0;
-                robotPresetHeight = 2;
-                if(isLiftUp){
-                    setHeight(2, Lift1, Lift2, fineTuneLift);
-                }
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.a){
-                fineTuneLift = 0;
-                robotPresetHeight = 1;
-                if(isLiftUp){
-                    setHeight(1, Lift1, Lift2, fineTuneLift);
-                }
-            }
-
-            if(gamepad2.right_bumper){
-                if(toggle){
-                    fineTuneLift += 219;
-                    setHeight(5, Lift1, Lift2, fineTuneLift);
-                    toggle = false;
-                }
-            }else{
-                toggle = true;
-            }
-            if(gamepad2.left_bumper){
-                if(toggle2){
-                    fineTuneLift -= 219;
-                    setHeight(5, Lift1, Lift2, fineTuneLift);
-                    toggle2 = false;
-                }
-            }else{
-                toggle2 = true;
-            }
             if(gamepad1.a){
-                if(toggle3){
-                    if(isLiftUp) {
-                        turnOffLift(Lift1,Lift2);
-                        toggle3 = false;
-                    }else{
-                        setHeight(robotPresetHeight, Lift1, Lift2, fineTuneLift);
-                        toggle3 = false;
-                    }
-                }
-            }else{
-                toggle3 = true;
+                Slurper.setPower(-1);
+            }else if(gamepad1.y){
+                Slurper.setPower(1);
+            }else if(gamepad1.b){
+                Slurper.setPower(0);
             }
+
+            if(gamepad1.right_trigger > 0){
+                Lift1.setPower(gamepad1.right_trigger);
+                Lift2.setPower(gamepad1.right_trigger);
+            }else if(gamepad1.left_trigger > 0){
+                Lift2.setPower(-gamepad1.left_trigger);
+                Lift1.setPower(-gamepad1.left_trigger);
+            }else if(Lift.isPressed()){
+                bottom = Lift1.getCurrentPosition();
+            }else{
+                Lift2.setPower(0);
+                Lift1.setPower(0);
+                Lift1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                Lift2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+
+            if(Lift1.getCurrentPosition() - bottom > 560){
+                arm.setTargetPosition(-2240);
+            }else{
+                arm.setTargetPosition(0);
+            }
+
+            if(armStop.isPressed()){
+                arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                arm.setTargetPosition(10);
+            }
+
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            arm.setPower(1);
 
 
             //lightTimer(runtime.seconds(), blinkinLedDriver);
 
-
-
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Lift1", Lift1.getCurrentPosition() - bottom);
+            telemetry.addData("Lift2", Lift2.getCurrentPosition() - bottom);
+            telemetry.addData("liftTouch", Lift.isPressed());
+            telemetry.addData("armTouch", armStop.isPressed());
+            telemetry.addData("armPos", arm.getCurrentPosition());
+            telemetry.addData("height", height);
             telemetry.update();
         }
     }
