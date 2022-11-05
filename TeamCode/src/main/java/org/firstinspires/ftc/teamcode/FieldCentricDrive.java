@@ -104,6 +104,8 @@ public class FieldCentricDrive extends LinearOpMode {
         CRServo Slurper;
         TouchSensor Lift, armStop;
 
+        double slowSpeed = .8;
+
         boolean toggle = true;
         boolean toggle2 = true;
         boolean toggle3 = true;
@@ -156,9 +158,13 @@ public class FieldCentricDrive extends LinearOpMode {
         Lift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
@@ -167,8 +173,6 @@ public class FieldCentricDrive extends LinearOpMode {
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
             float heading = angles.firstAngle;
-            double SlurperPower = 0.0;
-            int fineTuneLift = 0;
 
             telemetry.addData("heading", heading);
 
@@ -181,10 +185,29 @@ public class FieldCentricDrive extends LinearOpMode {
             final double v3 = r * Math.sin(robotAngle - radientsHeding) + rightX;
             final double v4 = r * Math.cos(robotAngle - radientsHeding) - rightX;
 
-            leftFrontDrive.setPower(v1);
-            rightFrontDrive.setPower(v2);
-            leftBackDrive.setPower(v3);
-            rightBackDrive.setPower(v4);
+            leftFrontDrive.setPower(v1 * slowSpeed);
+            rightFrontDrive.setPower(v2 * slowSpeed);
+            leftBackDrive.setPower(v3 * slowSpeed);
+            rightBackDrive.setPower(v4 * slowSpeed);
+
+            if(gamepad1.right_trigger > 0){
+                height += 40 * gamepad1.right_trigger;
+            }else if (gamepad1.left_trigger > 0){
+                height -= 40 * gamepad1.left_trigger;
+            }
+
+            Lift1.setTargetPosition(height);
+            Lift2.setTargetPosition(Lift1.getTargetPosition());
+            Lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Lift2.setMode(Lift1.getMode());
+            Lift1.setPower(1);
+            Lift2.setPower(Lift1.getPower());
+
+            if(Lift1.getCurrentPosition() - bottom > 530){
+                slowSpeed = .5;
+            }else{
+                slowSpeed = .8;
+            }
 
             if(gamepad1.a){
                 Slurper.setPower(-1);
@@ -194,31 +217,24 @@ public class FieldCentricDrive extends LinearOpMode {
                 Slurper.setPower(0);
             }
 
-            if(gamepad1.right_trigger > 0){
-                Lift1.setPower(gamepad1.right_trigger);
-                Lift2.setPower(gamepad1.right_trigger);
-            }else if(gamepad1.left_trigger > 0){
-                Lift2.setPower(-gamepad1.left_trigger);
-                Lift1.setPower(-gamepad1.left_trigger);
-            }else if(Lift.isPressed()){
-                bottom = Lift1.getCurrentPosition();
-            }else{
-                Lift2.setPower(0);
-                Lift1.setPower(0);
-                Lift1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                Lift2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            }
-
-            if(Lift1.getCurrentPosition() - bottom > 560){
-                arm.setTargetPosition(-2240);
+            if(Lift1.getCurrentPosition() - bottom > 360){
+                arm.setTargetPosition(-3100);
             }else{
                 arm.setTargetPosition(0);
             }
 
-            if(armStop.isPressed()){
-                arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                arm.setTargetPosition(10);
-            }
+//            if(gamepad1.dpad_up){
+//                arm.setPower(1);
+//            }else if(gamepad1.dpad_down){
+//                arm.setPower(-1);
+//            }else{
+//                arm.setPower(0);
+//            }
+
+//            if(armStop.isPressed()){
+//                arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                arm.setTargetPosition(10);
+//            }
 
             arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             arm.setPower(1);

@@ -57,6 +57,7 @@ public class MotorEncoderTestsManual extends LinearOpMode {
     DcMotor lift1 = null;
     DcMotor lift2 = null;
     TouchSensor liftStop;
+    DcMotor arm;
 
     @Override
     public void runOpMode() {
@@ -70,6 +71,7 @@ public class MotorEncoderTestsManual extends LinearOpMode {
         lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         lift2 = hardwareMap.get(DcMotor.class, "Lift2");
         liftStop = hardwareMap.get(TouchSensor.class, "Lift");
+        arm = hardwareMap.get(DcMotor.class, "arm");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -79,6 +81,7 @@ public class MotorEncoderTestsManual extends LinearOpMode {
 
         lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -89,11 +92,13 @@ public class MotorEncoderTestsManual extends LinearOpMode {
 
             lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
             telemetry.addData("lift1", lift1.getCurrentPosition());
             telemetry.addData("lift2", lift2.getCurrentPosition());
             telemetry.addData("liftLimit", liftStop.isPressed());
+            telemetry.addData("arm", arm.getCurrentPosition());
             telemetry.update();
         }
     }
