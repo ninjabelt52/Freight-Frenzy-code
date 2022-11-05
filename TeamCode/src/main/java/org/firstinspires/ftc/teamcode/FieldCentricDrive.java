@@ -190,19 +190,6 @@ public class FieldCentricDrive extends LinearOpMode {
             leftBackDrive.setPower(v3 * slowSpeed);
             rightBackDrive.setPower(v4 * slowSpeed);
 
-            if(gamepad1.right_trigger > 0){
-                height += 40 * gamepad1.right_trigger;
-            }else if (gamepad1.left_trigger > 0){
-                height -= 40 * gamepad1.left_trigger;
-            }
-
-            Lift1.setTargetPosition(height);
-            Lift2.setTargetPosition(Lift1.getTargetPosition());
-            Lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            Lift2.setMode(Lift1.getMode());
-            Lift1.setPower(1);
-            Lift2.setPower(Lift1.getPower());
-
             if(Lift1.getCurrentPosition() - bottom > 530){
                 slowSpeed = .5;
             }else{
@@ -221,6 +208,41 @@ public class FieldCentricDrive extends LinearOpMode {
                 arm.setTargetPosition(-3100);
             }else{
                 arm.setTargetPosition(0);
+            }
+
+            if(gamepad2.right_trigger > 0 && gamepad2.y){
+                height = 2700;
+            }else if(gamepad2.right_trigger > 0 && gamepad2.b){
+                height = 200;
+            }else if(gamepad2.right_trigger > 0 && gamepad2.x){
+                height = 300;
+            }else if(gamepad2.right_trigger > 0 && gamepad2.a){
+                height = 600;
+            }
+
+            if(gamepad1.x){
+                if(toggle){
+                    isLiftUp = !isLiftUp;
+                    toggle = false;
+                }
+            }else{
+                toggle = true;
+            }
+
+            if(isLiftUp){
+                Lift1.setTargetPosition(height);
+                Lift2.setTargetPosition(Lift1.getTargetPosition());
+                Lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                Lift2.setMode(Lift1.getMode());
+                Lift1.setPower(1);
+                Lift2.setPower(Lift1.getPower());
+            }else{
+                Lift1.setTargetPosition(0);
+                Lift2.setTargetPosition(Lift1.getTargetPosition());
+                Lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                Lift2.setMode(Lift1.getMode());
+                Lift1.setPower(1);
+                Lift2.setPower(Lift1.getPower());
             }
 
 //            if(gamepad1.dpad_up){
