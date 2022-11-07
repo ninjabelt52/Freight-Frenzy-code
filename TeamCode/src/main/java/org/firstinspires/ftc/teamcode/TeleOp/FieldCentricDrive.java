@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -112,10 +112,7 @@ public class FieldCentricDrive extends LinearOpMode {
 
         boolean isLiftUp = false;
         int robotPresetHeight = 1;
-
         int height = 0;
-
-
 
         //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -233,6 +230,7 @@ public class FieldCentricDrive extends LinearOpMode {
             }else if(gamepad2.right_trigger > 0 && gamepad2.a){
                 height = 500;
             }
+
 
             if(gamepad1.x){
                 if(toggle){
