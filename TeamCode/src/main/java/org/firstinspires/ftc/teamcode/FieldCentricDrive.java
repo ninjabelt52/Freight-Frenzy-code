@@ -78,7 +78,7 @@ public class FieldCentricDrive extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor rightFrontDrive = null;
 
-    double bottom = 0;
+    int bottom = 0;
 
     BNO055IMU imu;
 
@@ -165,6 +165,8 @@ public class FieldCentricDrive extends LinearOpMode {
         waitForStart();
 
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        Lift1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        Lift2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
@@ -204,20 +206,32 @@ public class FieldCentricDrive extends LinearOpMode {
                 Slurper.setPower(0);
             }
 
-            if(Lift1.getCurrentPosition() - bottom > 360){
+            if(Lift1.getCurrentPosition() > 800){
                 arm.setTargetPosition(-3100);
             }else{
                 arm.setTargetPosition(0);
             }
 
+//            if(gamepad1.right_trigger > 0){
+//                Lift1.setPower(gamepad1.right_trigger);
+//                Lift2.setPower(gamepad1.right_trigger);
+//            }else if(gamepad1.left_trigger > 0){
+//                Lift1.setPower(-gamepad1.left_trigger);
+//                Lift2.setPower(-gamepad1.left_trigger);
+//            }
+
+            if(Lift.isPressed()){
+                bottom = Lift1.getCurrentPosition();
+            }
+
             if(gamepad2.right_trigger > 0 && gamepad2.y){
-                height = 2700;
+                height = 1500;
             }else if(gamepad2.right_trigger > 0 && gamepad2.b){
                 height = 200;
             }else if(gamepad2.right_trigger > 0 && gamepad2.x){
-                height = 300;
+                height = 1000;
             }else if(gamepad2.right_trigger > 0 && gamepad2.a){
-                height = 600;
+                height = 500;
             }
 
             if(gamepad1.x){
