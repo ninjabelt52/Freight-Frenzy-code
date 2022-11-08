@@ -109,6 +109,7 @@ public class FieldCentricDrive extends LinearOpMode {
         boolean toggle = true;
         boolean toggle2 = true;
         boolean toggle3 = true;
+        boolean armUp = false;
 
         boolean isLiftUp = false;
         int robotPresetHeight = 1;
@@ -203,7 +204,7 @@ public class FieldCentricDrive extends LinearOpMode {
                 Slurper.setPower(0);
             }
 
-            if(Lift1.getCurrentPosition() > 800){
+            if(armUp && isLiftUp){
                 arm.setTargetPosition(-3100);
             }else{
                 arm.setTargetPosition(0);
@@ -223,13 +224,20 @@ public class FieldCentricDrive extends LinearOpMode {
 
             if(gamepad2.right_trigger > 0 && gamepad2.y){
                 height = 1500;
+                armUp = true;
             }else if(gamepad2.right_trigger > 0 && gamepad2.b){
-                height = 200;
+                height = 200  ;
+                armUp = true;
             }else if(gamepad2.right_trigger > 0 && gamepad2.x){
-                height = 1000;
+                height = 800;
+                armUp = true;
             }else if(gamepad2.right_trigger > 0 && gamepad2.a){
                 height = 500;
+                armUp = false;
             }
+
+//            mid: 1150
+//            low: 600
 
 
             if(gamepad1.x){
@@ -351,4 +359,3 @@ public class FieldCentricDrive extends LinearOpMode {
         slurper.setPower(0);
     }
 }
-//250, 700, 1200
