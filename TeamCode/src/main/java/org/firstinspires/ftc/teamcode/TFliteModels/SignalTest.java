@@ -50,9 +50,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "RunThisOneBOEN(TF Test)", group = "Concept")
+@TeleOp(name = "Signal Test", group = "Concept")
 //@Disabled
-public class SignalsTest extends LinearOpMode {
+public class SignalTest extends LinearOpMode {
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -64,11 +64,7 @@ public class SignalsTest extends LinearOpMode {
     //private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/Signals.tflite";
 
-
     private static final String[] LABELS = {
-            "bolt",
-            "helmet",
-            "swords"
     };
 
     /*

@@ -67,7 +67,9 @@ public class NewRedCupDetector extends LinearOpMode {
 
 
     private static final String[] LABELS = {
-            "RedCup"
+            "helmet",
+            "bolt",
+            "swords",
     };
 
     /*
