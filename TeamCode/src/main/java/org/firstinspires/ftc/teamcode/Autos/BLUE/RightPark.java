@@ -16,7 +16,7 @@ import java.util.Vector;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Autonomous
-public class CupDelivery extends LinearOpMode {
+public class RightPark extends LinearOpMode {
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 

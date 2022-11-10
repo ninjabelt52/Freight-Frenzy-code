@@ -63,11 +63,13 @@ public class NewRedCupDetector extends LinearOpMode {
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
     //private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/RedCup.tflite";
+    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/CustomDetector.tflite";
 
 
     private static final String[] LABELS = {
-            "RedCup"
+            "swords",
+            "helmet",
+            "bolt"
     };
 
     /*
@@ -178,7 +180,7 @@ public class NewRedCupDetector extends LinearOpMode {
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.75f;
-        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.isModelTensorFlow2 = false;
         tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 

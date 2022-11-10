@@ -5,22 +5,16 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.RoadRunner.trajectorysequence.TrajectorySequence;
 
-import java.util.Vector;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 @Autonomous
-public class RightPark extends LinearOpMode {
+public class LeftPark extends LinearOpMode {
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        drive.setPoseEstimate(new Pose2d(-36,64.75, Math.toRadians(-90)));
+        drive.setPoseEstimate(new Pose2d(36,64.75, Math.toRadians(-90)));
 
         String parkVar = "LEFT";
 
@@ -46,25 +40,25 @@ public class RightPark extends LinearOpMode {
 //        drive.turn(Math.toRadians(90));
 
         TrajectorySequence traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
-                .lineTo(new Vector2d(-36, 24))
-                .lineTo(new Vector2d(-36, 36))
-                .turn(Math.toRadians(90))
+                .lineTo(new Vector2d(36, 24))
+                .lineTo(new Vector2d(36, 36))
+                .turn(Math.toRadians(-90))
                 .build();
 
         drive.followTrajectorySequence(traj);
 
         if(parkVar.equals("LEFT")) {
             Trajectory trajL = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineTo(new Vector2d(-10, 38))
+                    .lineTo(new Vector2d(13, 36))
                     .build();
 
             drive.followTrajectory(trajL);
 
-            drive.turn(Math.toRadians(90));
+            drive.turn(Math.toRadians(-90));
         }else if(parkVar.equals("MIDDLE")) {
         }else if(parkVar.equals("RIGHT")) {
             Trajectory trajR = drive.trajectoryBuilder(drive.getPoseEstimate())
-                    .lineTo(new Vector2d(-60, 38))
+                    .lineTo(new Vector2d(60, 36))
                     .build();
 
             drive.followTrajectory(trajR);
