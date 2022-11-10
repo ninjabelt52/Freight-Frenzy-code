@@ -44,16 +44,6 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-/**
- * This 2022-2023 OpMode illustrates the basics of using the TensorFlow Object Detection API to
- * determine which image is being presented to the robot.
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
- *
- * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
- * is explained below.
- */
 @TeleOp(name = "LocalTrainedModelTF", group = "Concept")
 //@Disabled
 public class CustomTensorFlowTrained extends LinearOpMode {
@@ -69,20 +59,8 @@ public class CustomTensorFlowTrained extends LinearOpMode {
             "3 Panel"
     };
 
-    /*
-     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
-     * web site at https://developer.vuforia.com/license-manager.
-     *
-     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
-     * random data. As an example, here is a example of a fragment of a valid key:
-     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-     * Once you've obtained a license key, copy the string from the Vuforia web site
-     * and paste it in to your code on the next line, between the double quotes.
-     */
     private static final String VUFORIA_KEY =
-            " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+            "ATIZ5+n/////AAABmYR5zYS7b0fUh3KW5QXpeYpWedz730exbiG/c1eUwnbTLDy3S1zpCnndqs2H1bBRoRji6zODId1wNciirjMhrl3kb2xpxrhjWKGzfymlE48qjK1tSK9ctbVPDDEI7d3wiO1vISMt8XRVM0HJFumWl7snC0XtMEyTqy7IxrPv858Bm2voggonrgAx+WT/LcXxfsUQjd7SpX1AhzOEzksBRKfws0MP5hw7hLLbB+4QSb03hTA90Mh/7F78NxFG8yYmPrM0GMVg+3TRjteX6TWOHidLSmrIzsZNGFeqXCHOx4QIWIiMOIenqgau/XX2zCqvrMGCpOTb77oTjkvOlLNh9WizYdFPQjT/u7CeU1p3Y1ox";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -100,6 +78,7 @@ public class CustomTensorFlowTrained extends LinearOpMode {
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
+        readLabels();
         initVuforia();
         initTfod();
 
@@ -176,7 +155,7 @@ public class CustomTensorFlowTrained extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.6f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
@@ -184,6 +163,57 @@ public class CustomTensorFlowTrained extends LinearOpMode {
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
         //tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+        if (labels != null) {
+            tfod.loadModelFromFile(TFOD_MODEL_FILE, labels);
+        }
+    }
+
+    //NEW FUNCTIONS FOR TENSORFLOW MODELS
+    private String[] getStringArray(ArrayList<String> arr)
+    {
+        // declaration and initialize String Array
+        String str[] = new String[arr.size()];
+
+        // Convert ArrayList to object array
+        Object[] objArr = arr.toArray();
+
+        // Iterating and converting to String
+        int i = 0;
+        for (Object obj : objArr) {
+            str[i++] = (String)obj;
+        }
+
+        return str;
+    }
+
+    private void readLabels() {
+        ArrayList<String> labelList = new ArrayList<>();
+
+        // try to read in the the labels.
+        try (BufferedReader br = new BufferedReader(new FileReader(TFOD_MODEL_LABELS))) {
+            int index = 0;
+            while (br.ready()) {
+                if(index == 0) {
+                    // skip first line.
+                    br.readLine();
+                } else {
+                    labelList.add(br.readLine());
+                }
+                index++;
+            }
+        } catch (Exception e) {
+            telemetry.addData("Exception", e.getLocalizedMessage());
+            telemetry.update();
+        }
+
+        if (labelList.size() > 0) {
+            labels = getStringArray(labelList);
+            RobotLog.vv("readLabels()", "%d labels read.", labels.length);
+            for (String label : labels) {
+                RobotLog.vv("readLabels()", " " + label);
+            }
+        } else {
+            RobotLog.vv("readLabels()", "No labels read!");
+        }
     }
 }
