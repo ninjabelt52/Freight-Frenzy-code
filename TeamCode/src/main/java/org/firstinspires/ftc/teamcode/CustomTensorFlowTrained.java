@@ -48,8 +48,8 @@ import java.util.List;
 //@Disabled
 public class CustomTensorFlowTrained extends LinearOpMode {
 
-    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/detect.tflite";
-    private static final String TFOD_MODEL_LABELS = "/sdcard/FIRST/tflitemodels/labelmap.txt";
+    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/customModels/CustomDetector.tflite";
+    private static final String TFOD_MODEL_LABELS = "/sdcard/FIRST/customModels/labelmap.txt";
     private String[] labels;
 
 
@@ -156,7 +156,7 @@ public class CustomTensorFlowTrained extends LinearOpMode {
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.6f;
-        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.isModelTensorFlow2 = false;
         tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
 
