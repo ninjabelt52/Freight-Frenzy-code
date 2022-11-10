@@ -27,17 +27,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import java.util.List;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import com.qualcomm.robotcore.util.RobotLog;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+
+import java.util.List;
 
 /**
  * This 2022-2023 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -49,19 +54,13 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
+@TeleOp(name = "LocalTrainedModelTF", group = "Concept")
 //@Disabled
-public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
+public class CustomTensorFlowTrained extends LinearOpMode {
 
-    /*
-     * Specify the source for the Tensor Flow Model.
-     * If the TensorFlowLite object model is included in the Robot Controller App as an "asset",
-     * the OpMode must to load it using loadModelFromAsset().  However, if a team generated model
-     * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
-     * Here we assume it's an Asset.    Also see method initTfod() below .
-     */
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
+    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/detect.tflite";
+    private static final String TFOD_MODEL_LABELS = "/sdcard/FIRST/tflitemodels/labelmap.txt";
+    private String[] labels;
 
 
     private static final String[] LABELS = {
@@ -184,7 +183,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+        //tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+        tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 }
