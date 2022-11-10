@@ -54,9 +54,9 @@ public class CustomTensorFlowTrained extends LinearOpMode {
 
 
     private static final String[] LABELS = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
+            "bolt",
+            "helmet",
+            "swords"
     };
 
     private static final String VUFORIA_KEY =
