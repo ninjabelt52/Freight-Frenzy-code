@@ -5,6 +5,8 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.RoadRunner.trajectorysequence.TrajectorySequence;
@@ -18,6 +20,16 @@ import java.io.IOException;
 @Autonomous
 public class LeftPark extends LinearOpMode {
     public void runOpMode() {
+        DcMotor lift1, lift2;
+
+        lift1 = hardwareMap.get(DcMotor.class, "Lift1");
+        lift2 = hardwareMap.get(DcMotor.class, "Lift2");
+
+        lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        lift1.setDirection(DcMotorSimple.Direction.REVERSE);
+
         SignalSleeve detector = new SignalSleeve(hardwareMap, "Webcam 1");
         SignalSleeve.DuckPos pos = SignalSleeve.DuckPos.THREE;
 
@@ -27,8 +39,16 @@ public class LeftPark extends LinearOpMode {
         while(!isStarted()) {
             pos = detector.getPosition();
 
+            lift1.setTargetPosition(-400);
+            lift2.setTargetPosition(lift1.getTargetPosition());
+            lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift2.setMode(lift1.getMode());
+            lift1.setPower(.75);
+            lift2.setPower(lift1.getPower());
+
             telemetry.addData("Detecting", pos);
             telemetry.addLine("waiting for start");
+            telemetry.addData("liftPos", lift1.getCurrentPosition());
             telemetry.update();
         }
 

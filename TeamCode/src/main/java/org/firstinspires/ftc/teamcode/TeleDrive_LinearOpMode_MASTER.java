@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 @TeleOp(name = "TeleDrive-MASTER", group = "")
+@Disabled
 public class TeleDrive_LinearOpMode_MASTER extends LinearOpMode {
     private DatagramSocket socket;
     private boolean canRunGamepadThread;

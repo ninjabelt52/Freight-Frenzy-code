@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 @TeleOp(name = "whatever you want")
+@Disabled
 public class MecanumDrive extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

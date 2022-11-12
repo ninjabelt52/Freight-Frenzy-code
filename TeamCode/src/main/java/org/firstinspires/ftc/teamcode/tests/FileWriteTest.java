@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.oldcode.tests;
+package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -12,7 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class FileWriteTest extends LinearOpMode {
     public void runOpMode(){
 

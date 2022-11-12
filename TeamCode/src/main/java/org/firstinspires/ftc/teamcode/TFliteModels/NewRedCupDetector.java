@@ -52,7 +52,7 @@ import java.util.List;
  * is explained below.
  */
 @TeleOp(name = "RunThisOneBOEN(TF Test)", group = "Concept")
-//@Disabled
+@Disabled
 public class NewRedCupDetector extends LinearOpMode {
 
     /*

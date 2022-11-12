@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.oldcode.TeleOp;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 
 @Config
 @TeleOp(name = "RED Freight Frenzy TeleOp", group = "RED")
+@Disabled
 public class RedTeleOp extends LinearOpMode {
     public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2, straight, strafe, rotation;
     public static int BOTTOM = 175, MIDDLE = 250, HIGH = 350;

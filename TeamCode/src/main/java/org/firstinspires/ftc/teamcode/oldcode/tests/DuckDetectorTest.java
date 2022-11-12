@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.oldcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineBlue;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineRed;
 
-//@Disabled
+@Disabled
 @TeleOp
 public class DuckDetectorTest extends LinearOpMode {
     public void runOpMode(){

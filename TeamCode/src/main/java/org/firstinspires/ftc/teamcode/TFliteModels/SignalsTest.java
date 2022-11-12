@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode.TFliteModels;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -51,7 +52,7 @@ import java.util.List;
  * is explained below.
  */
 @TeleOp(name = "TF Test", group = "Concept")
-//@Disabled
+@Disabled
 public class SignalsTest extends LinearOpMode {
 
     /*

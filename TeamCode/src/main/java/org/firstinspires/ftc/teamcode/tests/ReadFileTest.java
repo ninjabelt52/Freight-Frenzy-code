@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -8,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 @TeleOp
+@Disabled
 public class ReadFileTest extends LinearOpMode {
     public void runOpMode(){
         String data = "";
