@@ -10,15 +10,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-import org.apache.commons.math3.stat.descriptive.moment.VectorialCovariance;
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.classes.Arm;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineRed;
 
-@Autonomous(name = "Get blocks red BOG", group = "Red")
+@Autonomous(name = "Get blocks red", group = "Red")
 @Disabled
-public class GetBlocksRedBOG extends LinearOpMode {
+public class ModifiedGetBlocksRed extends LinearOpMode {
     public void runOpMode(){
         DuckDetectorPipelineRed.DuckPos duckPos;
 
@@ -169,16 +167,16 @@ public class GetBlocksRedBOG extends LinearOpMode {
         sleep(1000);
         arm.close();
 
-        Trajectory lineup = drive.trajectoryBuilder(drive.getPoseEstimate())
-                .splineTo(new Vector2d(2,-41), Math.toRadians(0))
+        Trajectory park = drive.trajectoryBuilder(drive.getPoseEstimate())
+                .splineTo(new Vector2d(24, -65), 0)
+                .lineToLinearHeading(new Pose2d(43.38, -65, 0))
+                .addTemporalMarker(2, () -> {
+                    arm.moveArm(0, .5);
+                    intake.setPower(-1);
+                    arm.open();
+                })
                 .build();
 
-        drive.followTrajectory(lineup);
-
-        arm.moveArm(0, .5);
-
-        drive.setMotorPowers(1,1,1,1);
-        sleep(2000);
-        drive.setMotorPowers(0,0,0,0);
+        drive.followTrajectory(park);
     }
 }

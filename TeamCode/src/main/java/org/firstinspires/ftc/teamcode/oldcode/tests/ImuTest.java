@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.tests;
+package org.firstinspires.ftc.teamcode.oldcode.tests;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@Disabled
+//@Disabled
 @TeleOp
 public class ImuTest extends LinearOpMode {
     public void runOpMode() {
@@ -19,7 +19,9 @@ public class ImuTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            telemetry.addData("imu", imu.getAngularVelocity().yRotationRate);
+            telemetry.addData("imu-Y", imu.getAngularVelocity().yRotationRate);
+            telemetry.addData("imu-x", imu.getAngularVelocity().xRotationRate);
+            telemetry.addData("imu-z", imu.getAngularVelocity().zRotationRate);
             telemetry.update();
         }
     }

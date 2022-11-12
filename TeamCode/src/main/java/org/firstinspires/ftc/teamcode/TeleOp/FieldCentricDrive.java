@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -77,6 +78,8 @@ public class FieldCentricDrive extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor rightFrontDrive = null;
 
+    int bottom = 0;
+
     BNO055IMU imu;
 
     Orientation angles;
@@ -97,7 +100,11 @@ public class FieldCentricDrive extends LinearOpMode {
         parameters.loggingTag          = "IMU";
         DcMotor Lift1;
         DcMotor Lift2;
+        DcMotor arm;
         CRServo Slurper;
+        TouchSensor Lift, armStop;
+
+        double slowSpeed = .8;
 
         boolean toggle = true;
         boolean toggle2 = true;
@@ -105,8 +112,8 @@ public class FieldCentricDrive extends LinearOpMode {
 
         boolean isLiftUp = false;
         int robotPresetHeight = 1;
-
-
+        int height = 0;
+        int fineTune = 0;
 
         //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -122,6 +129,11 @@ public class FieldCentricDrive extends LinearOpMode {
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "fl");
         rightBackDrive = hardwareMap.get(DcMotor.class, "br");
         rightFrontDrive  = hardwareMap.get(DcMotor.class, "fr");
+        arm = hardwareMap.get(DcMotor.class, "arm");
+
+        Lift = hardwareMap.get(TouchSensor.class, "Lift");
+        armStop = hardwareMap.get(TouchSensor.class, "armStop");
+        //armStop = hardwareMap.get(TouchSensor.class, "armStop");
 
         Lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         Lift2 = hardwareMap.get(DcMotor.class, "Lift2");
@@ -138,8 +150,21 @@ public class FieldCentricDrive extends LinearOpMode {
         Lift2.setDirection(DcMotorSimple.Direction.FORWARD);
         Lift1.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        Lift1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Lift2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        Lift1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        Lift2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         runtime.reset();
 
         Lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -151,13 +176,11 @@ public class FieldCentricDrive extends LinearOpMode {
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
             float heading = angles.firstAngle;
-            double SlurperPower = 0.0;
-            int fineTuneLift = 0;
 
             telemetry.addData("heading", heading);
 
-            double r = Math.hypot(-gamepad1.left_stick_x, gamepad1.left_stick_y);
-            double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
+            double r = Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
+            double robotAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
             double rightX = gamepad1.right_stick_x;
             double radientsHeding = angles.firstAngle * Math.PI/180;
             final double v1 = r * Math.cos(robotAngle - radientsHeding) + rightX;
@@ -165,70 +188,118 @@ public class FieldCentricDrive extends LinearOpMode {
             final double v3 = r * Math.sin(robotAngle - radientsHeding) + rightX;
             final double v4 = r * Math.cos(robotAngle - radientsHeding) - rightX;
 
-            leftFrontDrive.setPower(v1);
-            rightFrontDrive.setPower(v2);
-            leftBackDrive.setPower(v3);
-            rightBackDrive.setPower(v4);
-            Slurper.setPower(SlurperPower);
+            leftFrontDrive.setPower(v1 * slowSpeed);
+            rightFrontDrive.setPower(v2 * slowSpeed);
+            leftBackDrive.setPower(v3 * slowSpeed);
+            rightBackDrive.setPower(v4 * slowSpeed);
 
-            if (gamepad1.dpad_left){
-                SlurperPower -= -1;
-            }
-            if (gamepad1.dpad_right) {
-                SlurperPower += .1;
-            }
-
-
-            if(gamepad2.left_trigger > 0.2 && gamepad2.y){
-                robotPresetHeight = 4;
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.x){
-                robotPresetHeight = 3;
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.b){
-                robotPresetHeight = 2;
-            }else if(gamepad2.left_trigger > 0.2 && gamepad2.a){
-                robotPresetHeight = 1;
-            }
-
-            if(isLiftUp){
-                setHeight(robotPresetHeight, Lift1, Lift2, fineTuneLift);
+            if(Lift1.getCurrentPosition() - bottom > 530){
+                slowSpeed = .5;
             }else{
-                setHeight(0, Lift1, Lift2, fineTuneLift);
+                slowSpeed = .8;
             }
 
-            if(gamepad2.right_bumper){
+            if(gamepad1.a){
+                Slurper.setPower(-1);
+            }else if(gamepad1.y){
+                Slurper.setPower(1);
+            }else if(gamepad1.b){
+                Slurper.setPower(0);
+            }
+
+            if(Lift1.getCurrentPosition() > 800){
+                arm.setTargetPosition(-3100);
+            }else{
+                arm.setTargetPosition(0);
+            }
+
+//            if(gamepad1.right_trigger > 0){
+//                Lift1.setPower(gamepad1.right_trigger);
+//                Lift2.setPower(gamepad1.right_trigger);
+//            }else if(gamepad1.left_trigger > 0){
+//                Lift1.setPower(-gamepad1.left_trigger);
+//                Lift2.setPower(-gamepad1.left_trigger);
+//            }
+
+            if(Lift.isPressed()){
+                bottom = Lift1.getCurrentPosition();
+            }
+
+            if(gamepad2.right_trigger > 0 && gamepad2.y){
+                height = 1500;
+                fineTune = 0;
+            }else if(gamepad2.right_trigger > 0 && gamepad2.b){
+                height = 200;
+                fineTune = 0;
+            }else if(gamepad2.right_trigger > 0 && gamepad2.x){
+                height = 1000;
+                fineTune = 0;
+            }else if(gamepad2.right_trigger > 0 && gamepad2.a){
+                height = 500;
+                fineTune = 0;
+            }
+            if(gamepad2.dpad_up){
+                fineTune = fineTune +1;
+            }else if(gamepad2.dpad_down){
+                fineTune = fineTune -1;
+            }
+
+
+            if(gamepad1.x){
                 if(toggle){
-                    fineTuneLift += 219;
-                    setHeight(5, Lift1, Lift2, fineTuneLift);
+                    isLiftUp = !isLiftUp;
                     toggle = false;
                 }
             }else{
                 toggle = true;
             }
-            if(gamepad2.left_bumper){
-                if(toggle2){
-                    fineTuneLift -= 219;
-                    setHeight(5, Lift1, Lift2, fineTuneLift);
-                    toggle2 = false;
-                }
-            }else{
-                toggle2 = true;
+            if(gamepad1.right_stick_button){
+                arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             }
-            if(gamepad1.a){
-                if(toggle3){
-                    isLiftUp = !isLiftUp;
-                }
+
+            if(isLiftUp){
+                Lift1.setTargetPosition(height + fineTune);
+                Lift2.setTargetPosition(Lift1.getTargetPosition());
+                Lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                Lift2.setMode(Lift1.getMode());
+                Lift1.setPower(1);
+                Lift2.setPower(Lift1.getPower());
             }else{
-                toggle3 = true;
+                Lift1.setTargetPosition(0);
+                Lift2.setTargetPosition(Lift1.getTargetPosition());
+                Lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                Lift2.setMode(Lift1.getMode());
+                Lift1.setPower(1);
+                Lift2.setPower(Lift1.getPower());
             }
+
+//            if(gamepad1.dpad_up){
+//                arm.setPower(1);
+//            }else if(gamepad1.dpad_down){
+//                arm.setPower(-1);
+//            }else{
+//                arm.setPower(0);
+//            }
+
+//            if(armStop.isPressed()){
+//                arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                arm.setTargetPosition(10);
+//            }
+
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            arm.setPower(1);
 
 
             //lightTimer(runtime.seconds(), blinkinLedDriver);
 
-
-
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            //telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.addData("Lift1", Lift1.getCurrentPosition() - bottom);
+            telemetry.addData("Lift2", Lift2.getCurrentPosition() - bottom);
+            telemetry.addData("liftTouch", Lift.isPressed());
+            telemetry.addData("armTouch", armStop.isPressed());
+            telemetry.addData("armPos", arm.getCurrentPosition());
+            telemetry.addData("height", height);
             telemetry.update();
         }
     }

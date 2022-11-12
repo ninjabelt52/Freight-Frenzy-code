@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autos.RED;
+package org.firstinspires.ftc.teamcode.oldcode.Autos.RED;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -9,10 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.RoadRunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.classes.Arm;
-import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineBlue;
 import org.firstinspires.ftc.teamcode.classes.DuckDetectorPipelineRed;
 
 @Autonomous(name = "Red GUI auto", group = "Red")
@@ -177,19 +175,22 @@ public class GUIAutoRed extends LinearOpMode {
                 sleep(250);
             }
 
-            Trajectory collect1 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
-                    .splineTo(new Vector2d(24, -66), 0,
-                            SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                    .lineToLinearHeading(new Pose2d(49, -66, 0))
-                    .addTemporalMarker(1.5, () -> {
-                        intake.setPower(-1);
-                        arm.moveArm(0, 1);
-                        arm.open(.37,1);
-                    })
-                    .build();
+//            LOOK!!!: This line has been commented out because it is causing errors that I
+//            don't care to fix.
 
-            drive.followTrajectory(collect1);
+//            Trajectory collect1 = drive.trajectoryBuilder(drive.getPoseEstimate(), false)
+//                    .splineTo(new Vector2d(24, -66), 0,
+//                            SampleMecanumDrive.getVelocityConstraint(30, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+//                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+//                    .lineToLinearHeading(new Pose2d(49, -66, 0))
+//                    .addTemporalMarker(1.5, () -> {
+//                        intake.setPower(-1);
+//                        arm.moveArm(0, 1);
+//                        arm.open(.37,1);
+//                    })
+//                    .build();
+
+//            drive.followTrajectory(collect1);
 
             Trajectory backup1 = drive.trajectoryBuilder(drive.getPoseEstimate())
                     .lineToLinearHeading(new Pose2d(24,-66, 0))

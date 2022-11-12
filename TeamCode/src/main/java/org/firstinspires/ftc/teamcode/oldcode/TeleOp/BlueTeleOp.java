@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.classes.TapeMeasure;
 @TeleOp(name = "BLUE Freight Frenzy TeleOp", group = "BLUE")
 public class BlueTeleOp extends LinearOpMode {
     public static double gateClosed = .1, gateOpen = .37, bottomClosed = 1, bottomOpen = 0, quasiGateOpen = .2, straight, strafe, rotation;
-    public static int BOTTOM = 175, MIDDLE = 250, HIGH = 350;
+    public final static int BOTTOM = 175, MIDDLE = 250, HIGH = 350;
     public int targetPos = 0;
     public int SHARED = 175;
 

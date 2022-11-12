@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 @TeleOp
+@Disabled
 public class EncoderTests extends LinearOpMode {
     public void runOpMode(){
         DcMotor bl,br,fl,fr,intake,duckWheel,leftArm,rightArm;

@@ -27,11 +27,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -48,14 +49,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="ControllerMotorEncoderSet", group="Linear Opmode")
+@TeleOp(name="ManualMotorEncoderSet", group="Linear Opmode")
 //@Disabled
-public class MotorEncoderTestsController extends LinearOpMode {
+public class MotorEncoderTestsManual extends LinearOpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor lift1 = null;
-    private DcMotor lift2 = null;
-    private int liftTarget = 0;
+    ElapsedTime runtime = new ElapsedTime();
+    DcMotor lift1 = null;
+    DcMotor lift2 = null;
+    DcMotor bl, br, fl, fr;
+    TouchSensor liftStop;
+    DcMotor arm;
 
     @Override
     public void runOpMode() {
@@ -68,12 +71,22 @@ public class MotorEncoderTestsController extends LinearOpMode {
 
         lift1 = hardwareMap.get(DcMotor.class, "Lift1");
         lift2 = hardwareMap.get(DcMotor.class, "Lift2");
+        liftStop = hardwareMap.get(TouchSensor.class, "Lift");
+        bl = hardwareMap.get(DcMotor.class, "bl");
+        br = hardwareMap.get(DcMotor.class, "br");
+        fl = hardwareMap.get(DcMotor.class, "fl");
+        fr = hardwareMap.get(DcMotor.class, "fr");
+        arm = hardwareMap.get(DcMotor.class, "arm");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         lift1.setDirection(DcMotor.Direction.FORWARD);
         lift2.setDirection(DcMotor.Direction.REVERSE);
+
+        lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -82,27 +95,19 @@ public class MotorEncoderTestsController extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            if (gamepad1.a){
-                liftTarget ++;
-            }else if (gamepad1.b){
-                liftTarget --;
-            }
-
-
-            lift1.setTargetPosition(liftTarget);
-            lift2.setTargetPosition(liftTarget);
             lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lift1.setPower(0.6);
-            lift2.setPower(0.6);
+            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("liftEncoder", "lift1 (%.2f), lift2 (%.2f)", lift1.getCurrentPosition(), lift2.getCurrentPosition());
-            telemetry.addData("Lift Target Pos", liftTarget);
+            telemetry.addData("lift1", lift1.getCurrentPosition());
+            telemetry.addData("lift2", lift2.getCurrentPosition());
+            telemetry.addData("liftLimit", liftStop.isPressed());
+            telemetry.addData("arm", arm.getCurrentPosition());
+            telemetry.addData("bl", bl.getCurrentPosition());
+            telemetry.addData("br", br.getCurrentPosition());
+            telemetry.addData("fl", fl.getCurrentPosition());
+            telemetry.addData("fr", fr.getCurrentPosition());
             telemetry.update();
         }
     }

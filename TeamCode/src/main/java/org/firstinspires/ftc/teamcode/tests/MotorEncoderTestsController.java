@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -48,14 +48,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="ManualMotorEncoderSet", group="Linear Opmode")
+@TeleOp(name="ControllerMotorEncoderSet", group="Linear Opmode")
 //@Disabled
-public class MotorEncoderTestsManual extends LinearOpMode {
+public class MotorEncoderTestsController extends LinearOpMode {
 
-    ElapsedTime runtime = new ElapsedTime();
-    DcMotor lift1 = null;
-    DcMotor lift2 = null;
-    int liftTarget = 0;
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor lift1 = null;
+    private DcMotor lift2 = null;
+    private int liftTarget = 0;
 
     @Override
     public void runOpMode() {
@@ -75,9 +75,6 @@ public class MotorEncoderTestsManual extends LinearOpMode {
         lift1.setDirection(DcMotor.Direction.FORWARD);
         lift2.setDirection(DcMotor.Direction.REVERSE);
 
-        lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -85,12 +82,27 @@ public class MotorEncoderTestsManual extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            if (gamepad1.a){
+                liftTarget ++;
+            }else if (gamepad1.b){
+                liftTarget --;
+            }
+
+
+            lift1.setTargetPosition(liftTarget);
+            lift2.setTargetPosition(liftTarget);
             lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift1.setPower(0.6);
+            lift2.setPower(0.6);
 
 
-            telemetry.addData("lift1", lift1.getCurrentPosition());
-            telemetry.addData("lift2", lift2.getCurrentPosition());
+            // Show the elapsed game time and wheel power.
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("liftEncoder", "lift1 (%.2f), lift2 (%.2f)", lift1.getCurrentPosition(), lift2.getCurrentPosition());
+            telemetry.addData("Lift Target Pos", liftTarget);
             telemetry.update();
         }
     }
