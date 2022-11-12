@@ -97,7 +97,6 @@ public class MotorEncoderTestsManual extends LinearOpMode {
 
             lift1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             lift2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
             telemetry.addData("lift1", lift1.getCurrentPosition());
