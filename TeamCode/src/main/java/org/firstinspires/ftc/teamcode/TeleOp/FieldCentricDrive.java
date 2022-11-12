@@ -113,6 +113,7 @@ public class FieldCentricDrive extends LinearOpMode {
         boolean isLiftUp = false;
         int robotPresetHeight = 1;
         int height = 0;
+        int fineTune = 0;
 
         //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "led");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -226,12 +227,21 @@ public class FieldCentricDrive extends LinearOpMode {
 
             if(gamepad2.right_trigger > 0 && gamepad2.y){
                 height = 1500;
+                fineTune = 0;
             }else if(gamepad2.right_trigger > 0 && gamepad2.b){
                 height = 200;
+                fineTune = 0;
             }else if(gamepad2.right_trigger > 0 && gamepad2.x){
                 height = 1000;
+                fineTune = 0;
             }else if(gamepad2.right_trigger > 0 && gamepad2.a){
                 height = 500;
+                fineTune = 0;
+            }
+            if(gamepad2.dpad_up){
+                fineTune = fineTune +1;
+            }else if(gamepad2.dpad_down){
+                fineTune = fineTune -1;
             }
 
 
@@ -245,7 +255,7 @@ public class FieldCentricDrive extends LinearOpMode {
             }
 
             if(isLiftUp){
-                Lift1.setTargetPosition(height);
+                Lift1.setTargetPosition(height + fineTune);
                 Lift2.setTargetPosition(Lift1.getTargetPosition());
                 Lift1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 Lift2.setMode(Lift1.getMode());
