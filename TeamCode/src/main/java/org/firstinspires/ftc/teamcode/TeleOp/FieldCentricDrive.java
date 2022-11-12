@@ -253,6 +253,9 @@ public class FieldCentricDrive extends LinearOpMode {
             }else{
                 toggle = true;
             }
+            if(gamepad1.right_stick_button){
+                arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
 
             if(isLiftUp){
                 Lift1.setTargetPosition(height + fineTune);
