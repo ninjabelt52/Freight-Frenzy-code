@@ -8,36 +8,31 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.RoadRunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.classes.MLToolChain;
+import org.firstinspires.ftc.teamcode.classes.SignalSleeve;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 @Autonomous
 public class LeftPark extends LinearOpMode {
     public void runOpMode() {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        SignalSleeve detector = new SignalSleeve(hardwareMap, "Webcam 1");
+        SignalSleeve.DuckPos pos = SignalSleeve.DuckPos.THREE;
 
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(new Pose2d(36,64.75, Math.toRadians(-90)));
 
-        String parkVar = "LEFT";
+        while(!isStarted()) {
+            pos = detector.getPosition();
 
-        telemetry.addLine("waiting for start");
-        telemetry.update();
+            telemetry.addData("Detecting", pos);
+            telemetry.addLine("waiting for start");
+            telemetry.update();
+        }
 
         waitForStart();
-//        Trajectory forward = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                .splineTo(new Vector2d(-48, 36), Math.toRadians(-90))
-//                .lineToLinearHeading(new Pose2d(-36,36, Math.toRadians(180)))
-//                .build();
-//
-//        drive.followTrajectory(forward);
-//
-//
-//        Trajectory deliver = drive.trajectoryBuilder(drive.getPoseEstimate())
-//                .lineToLinearHeading(new Pose2d(-12, 36, Math.toRadians(-255)))
-//                .build();
-//
-//        drive.followTrajectory(deliver);
-//
-//
-//        drive.turn(Math.toRadians(90));
 
         TrajectorySequence traj = drive.trajectorySequenceBuilder(drive.getPoseEstimate())
                 .lineTo(new Vector2d(36, 24))
@@ -47,7 +42,7 @@ public class LeftPark extends LinearOpMode {
 
         drive.followTrajectorySequence(traj);
 
-        if(parkVar.equals("LEFT")) {
+        if(pos.equals(SignalSleeve.DuckPos.THREE)) {
             Trajectory trajL = drive.trajectoryBuilder(drive.getPoseEstimate())
                     .lineTo(new Vector2d(13, 36))
                     .build();
@@ -55,13 +50,26 @@ public class LeftPark extends LinearOpMode {
             drive.followTrajectory(trajL);
 
             drive.turn(Math.toRadians(-90));
-        }else if(parkVar.equals("MIDDLE")) {
-        }else if(parkVar.equals("RIGHT")) {
+        }else if(pos.equals(SignalSleeve.DuckPos.TWO)) {
+        }else if(pos.equals(SignalSleeve.DuckPos.ONE)) {
             Trajectory trajR = drive.trajectoryBuilder(drive.getPoseEstimate())
                     .lineTo(new Vector2d(60, 36))
                     .build();
 
             drive.followTrajectory(trajR);
+        }
+
+        try {
+            File test = new File("/sdcard/FIRST/nums.txt");
+            FileWriter writer = new FileWriter("/sdcard/FIRST/nums.txt");
+            writer.write(Math.toDegrees(drive.getPoseEstimate().getHeading()) + "");
+            writer.close();
+            telemetry.addLine("successfully wrote!");
+            telemetry.update();
+        } catch (IOException e) {
+            telemetry.addLine("couldn't create file");
+            telemetry.update();
+            e.printStackTrace();
         }
     }
 }

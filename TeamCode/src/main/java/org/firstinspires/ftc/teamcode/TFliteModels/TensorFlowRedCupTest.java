@@ -40,34 +40,16 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-/**
- * This 2022-2023 OpMode illustrates the basics of using the TensorFlow Object Detection API to
- * determine which image is being presented to the robot.
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
- *
- * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
- * is explained below.  ``````````````````
- */
 @TeleOp(name = "TensorFlow RedCup Test", group = "Concept")
-//@Disabled
 public class TensorFlowRedCupTest extends LinearOpMode {
 
-    /*
-     * Specify the source for the Tensor Flow Model.
-     * If the TensorFlowLite object model is included in the Robot Controller App as an "asset",
-     * the OpMode must to load it using loadModelFromAsset().  However, if a team generated model
-     * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
-     * Here we assume it's an Asset.    Also see method initTfod() below .
-     */
-    //private static final String TFOD_MODEL_ASSET = "/storage/emulated/0/FIRST/tflitemodels/RedCup.tflite";
-    //private static final String TFOD_MODEL_ASSET = "/sdcard/FIRST/RedCup.tflite";
-    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/RedCupDetector.tflite";
+    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/customModels/TFSignalSleeve.tflite";
 
 
     private static final String[] LABELS = {
-            "RedCup"
+            "bolt",
+            "helmet",
+            "swords"
     };
 
     /*
@@ -117,7 +99,7 @@ public class TensorFlowRedCupTest extends LinearOpMode {
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(1, 16.0/10.0);
+            tfod.setZoom(2, 16.0/10.0);
         }
 
         /** Wait for the game to begin */
@@ -177,7 +159,7 @@ public class TensorFlowRedCupTest extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.65f;
+        tfodParameters.minResultConfidence = 0.50f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

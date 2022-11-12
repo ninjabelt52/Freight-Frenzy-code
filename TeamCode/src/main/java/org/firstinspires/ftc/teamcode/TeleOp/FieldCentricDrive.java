@@ -51,7 +51,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Locale;
+import java.util.Scanner;
 
 
 /**
@@ -86,8 +89,6 @@ public class FieldCentricDrive extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
 
         //RevBlinkinLedDriver blinkinLedDriver;
         //RevBlinkinLedDriver.BlinkinPattern pattern;
@@ -119,6 +120,25 @@ public class FieldCentricDrive extends LinearOpMode {
         imu.initialize(parameters);
 
         angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        String data = "0";
+        try {
+            File obj = new File("/sdcard/FIRST/nums.txt");
+            Scanner scan = new Scanner(obj);
+
+            while (scan.hasNextLine()){
+                telemetry.addLine("Reading...");
+                telemetry.update();
+                data = scan.nextLine();
+            }
+            scan.close();
+        }catch (FileNotFoundException e){
+            telemetry.addLine("couldn't read");
+            telemetry.update();
+            e.printStackTrace();
+        }
+
+        double offset = Double.parseDouble(data) +90;
 
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -158,6 +178,10 @@ public class FieldCentricDrive extends LinearOpMode {
         Lift1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Lift2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        telemetry.addData("offset", offset);
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
@@ -171,14 +195,14 @@ public class FieldCentricDrive extends LinearOpMode {
 
             angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-            float heading = angles.firstAngle;
+            double heading = angles.firstAngle + offset;
 
             telemetry.addData("heading", heading);
 
             double r = Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
             double robotAngle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
             double rightX = gamepad1.right_stick_x;
-            double radientsHeding = angles.firstAngle * Math.PI/180;
+            double radientsHeding = heading * Math.PI/180;
             final double v1 = r * Math.cos(robotAngle - radientsHeding) + rightX;
             final double v2 = r * Math.sin(robotAngle - radientsHeding) - rightX;
             final double v3 = r * Math.sin(robotAngle - radientsHeding) + rightX;
@@ -226,7 +250,7 @@ public class FieldCentricDrive extends LinearOpMode {
             }else if(gamepad2.right_trigger > 0 && gamepad2.b){
                 height = 200;
             }else if(gamepad2.right_trigger > 0 && gamepad2.x){
-                height = 1000;
+                height = 800;
             }else if(gamepad2.right_trigger > 0 && gamepad2.a){
                 height = 500;
             }
@@ -284,6 +308,7 @@ public class FieldCentricDrive extends LinearOpMode {
             telemetry.addData("armTouch", armStop.isPressed());
             telemetry.addData("armPos", arm.getCurrentPosition());
             telemetry.addData("height", height);
+            telemetry.addData("heading", heading);
             telemetry.update();
         }
     }
