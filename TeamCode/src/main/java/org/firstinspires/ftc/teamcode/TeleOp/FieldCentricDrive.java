@@ -246,9 +246,9 @@ public class FieldCentricDrive extends LinearOpMode {
 
 
             if(gamepad2.dpad_up){
-                fineTune = fineTune +1;
+                fineTune = fineTune + 2;
             }else if(gamepad2.dpad_down) {
-                fineTune = fineTune - 1;
+                fineTune = fineTune - 2;
             }
 
 //            mid: 1150
