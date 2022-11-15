@@ -234,12 +234,12 @@ public class FieldCentricDrive extends LinearOpMode {
             }
 
             if(armUp && isLiftUp){
-                arm.setTargetPosition(-3100 + armFineTune);
+                arm.setTargetPosition(-3150 + armFineTune);
             }else{
                 arm.setTargetPosition(0);
             }
 
-//            if(gamepad1.right_trigger > 0){
+            //            if(gamepad1.right_trigger > 0){
 //                Lift1.setPower(gamepad1.right_trigger);
 //                Lift2.setPower(gamepad1.right_trigger);
 //            }else if(gamepad1.left_trigger > 0){
